@@ -14,27 +14,29 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary">
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-24 flex flex-col items-center text-center gap-8">
-        <div className="flex items-center gap-2 text-foreground mb-4">
-          <Brain className="w-8 h-8" />
-          <span className="text-2xl font-bold">Infoscribe</span>
-        </div>
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight max-w-3xl">
           Stay Informed Effortlessly with{" "}
-          <span className="text-primary">AI-Powered Newsletters</span>
+          <span className="text-[#FFB800]">AI-Powered Newsletters</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl">
           Infoscribe automatically summarizes the latest news in your chosen
           categories and delivers a curated newsletter to your inbox.
         </p>
-        <Button size="lg" className="mt-8">
-          Get Started for Free
-        </Button>
+        <Link href="/signup">
+          <Button
+            size="lg"
+            className="mt-8 bg-[#F2F3D9] text-[#030027] hover:bg-[#F2F3D9]/90"
+          >
+            Get Started for Free
+          </Button>
+        </Link>
       </section>
 
       {/* Key Features Section */}
@@ -42,8 +44,8 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center mb-16">Key Features</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <Card className="p-6 flex flex-col gap-4 items-start">
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <Sparkles className="w-6 h-6 text-primary" />
+            <div className="p-3 bg-[#FFB800]/10 rounded-lg">
+              <Sparkles className="w-6 h-6 text-[#FFB800]" />
             </div>
             <h3 className="text-xl font-semibold">
               AI-Powered News Summarization
@@ -54,8 +56,8 @@ export default function Home() {
             </p>
           </Card>
           <Card className="p-6 flex flex-col gap-4 items-start">
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <Mail className="w-6 h-6 text-primary" />
+            <div className="p-3 bg-[#FFB800]/10 rounded-lg">
+              <Mail className="w-6 h-6 text-[#FFB800]" />
             </div>
             <h3 className="text-xl font-semibold">
               Fully Automated Newsletter Delivery
@@ -66,8 +68,8 @@ export default function Home() {
             </p>
           </Card>
           <Card className="p-6 flex flex-col gap-4 items-start">
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <Settings className="w-6 h-6 text-primary" />
+            <div className="p-3 bg-[#FFB800]/10 rounded-lg">
+              <Settings className="w-6 h-6 text-[#FFB800]" />
             </div>
             <h3 className="text-xl font-semibold">
               Personalized News Curation
@@ -87,21 +89,21 @@ export default function Home() {
         </h2>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="flex flex-col items-center text-center gap-4">
-            <Clock className="w-12 h-12 text-primary" />
+            <Clock className="w-12 h-12 text-[#FFB800]" />
             <h3 className="text-xl font-semibold">Time Constraints</h3>
             <p className="text-muted-foreground">
               Get only the essential news without spending hours browsing.
             </p>
           </div>
           <div className="flex flex-col items-center text-center gap-4">
-            <Filter className="w-12 h-12 text-primary" />
+            <Filter className="w-12 h-12 text-[#FFB800]" />
             <h3 className="text-xl font-semibold">Information Overload</h3>
             <p className="text-muted-foreground">
               AI filters redundant articles and curates relevant updates.
             </p>
           </div>
           <div className="flex flex-col items-center text-center gap-4">
-            <Newspaper className="w-12 h-12 text-primary" />
+            <Newspaper className="w-12 h-12 text-[#FFB800]" />
             <h3 className="text-xl font-semibold">
               Hassle-Free News Management
             </h3>
@@ -130,7 +132,7 @@ export default function Home() {
           <TabsContent value="filtering" className="mt-8">
             <Card className="p-6">
               <div className="flex gap-4 items-start">
-                <Rocket className="w-8 h-8 text-primary flex-shrink-0" />
+                <Rocket className="w-8 h-8 text-[#FFB800] flex-shrink-0" />
                 <div>
                   <h3 className="text-xl font-semibold mb-2">
                     More Advanced Filtering & Recommendations
@@ -147,7 +149,7 @@ export default function Home() {
           <TabsContent value="ui" className="mt-8">
             <Card className="p-6">
               <div className="flex gap-4 items-start">
-                <Rocket className="w-8 h-8 text-primary flex-shrink-0" />
+                <Rocket className="w-8 h-8 text-[#FFB800] flex-shrink-0" />
                 <div>
                   <h3 className="text-xl font-semibold mb-2">
                     Enhanced UI/UX for Subscriber Management
@@ -163,7 +165,7 @@ export default function Home() {
           <TabsContent value="enterprise" className="mt-8">
             <Card className="p-6">
               <div className="flex gap-4 items-start">
-                <Rocket className="w-8 h-8 text-primary flex-shrink-0" />
+                <Rocket className="w-8 h-8 text-[#FFB800] flex-shrink-0" />
                 <div>
                   <h3 className="text-xl font-semibold mb-2">
                     Team and Enterprise Solutions
@@ -182,7 +184,7 @@ export default function Home() {
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-24 text-center">
         <Card className="max-w-4xl mx-auto p-12 bg-[#F2F3D9] text-[#030027]">
-          <Users className="w-16 h-16 mx-auto mb-8" />
+          <Users className="w-16 h-16 mx-auto mb-8 text-[#FFB800]" />
           <h2 className="text-3xl font-bold mb-4">
             Sign up today and let Infoscribe be your AI-powered news assistant!
           </h2>
@@ -190,9 +192,14 @@ export default function Home() {
             Join thousands of users who are already saving time and staying
             informed with Infoscribe.
           </p>
-          <Button size="lg" variant="secondary">
-            Get Started for Free
-          </Button>
+          <Link href="/signup">
+            <Button
+              size="lg"
+              className="bg-[#030027] text-[#F2F3D9] hover:bg-[#030027]/90"
+            >
+              Get Started for Free
+            </Button>
+          </Link>
         </Card>
       </section>
     </main>

@@ -75,14 +75,14 @@ const newsletters: Newsletter[] = [
 export default function SubscriptionsPage() {
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Subscriptions</h2>
           <p className="text-muted-foreground">
             Manage your newsletter subscriptions here.
           </p>
         </div>
-        <div className="w-72">
+        <div className="w-full sm:w-72">
           <Input
             placeholder="Search providers..."
             className="w-full"
@@ -97,13 +97,13 @@ export default function SubscriptionsPage() {
         </TabsList>
 
         <TabsContent value="my-subscriptions" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {newsletters
               .filter(newsletter => newsletter.isSubscribed)
               .map((newsletter) => (
                 <Card key={newsletter.id} className="p-4">
                   <div className="space-y-3">
-                    <h3 className="text-xl font-semibold">{newsletter.title}</h3>
+                    <h3 className="text-xl font-semibold break-words">{newsletter.title}</h3>
                     <div className="flex flex-wrap gap-2">
                       {newsletter.categories.map((category) => (
                         <Badge key={category} variant="secondary" className="bg-[#F2F3D9] text-[#030027] hover:bg-[#F2F3D9]/90">
@@ -111,14 +111,14 @@ export default function SubscriptionsPage() {
                         </Badge>
                       ))}
                       <div className="flex items-center text-sm text-muted-foreground">
-                        <CalendarIcon className="h-4 w-4 mr-1" />
+                        <CalendarIcon className="h-4 w-4 mr-1 flex-shrink-0" />
                         {newsletter.frequency}
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       {newsletter.description}
                     </p>
-                    <div className="flex items-center gap-2 pt-2">
+                    <div className="flex flex-wrap items-center gap-2 pt-2">
                       <Button variant="outline" size="sm" className="h-8">
                         View Archive
                       </Button>
@@ -133,13 +133,13 @@ export default function SubscriptionsPage() {
         </TabsContent>
 
         <TabsContent value="discover" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {newsletters
               .filter(newsletter => !newsletter.isSubscribed)
               .map((newsletter) => (
                 <Card key={newsletter.id} className="p-4">
                   <div className="space-y-3">
-                    <h3 className="text-xl font-semibold">{newsletter.title}</h3>
+                    <h3 className="text-xl font-semibold break-words">{newsletter.title}</h3>
                     <div className="flex flex-wrap gap-2">
                       {newsletter.categories.map((category) => (
                         <Badge key={category} variant="secondary" className="bg-[#F2F3D9] text-[#030027] hover:bg-[#F2F3D9]/90">
@@ -147,7 +147,7 @@ export default function SubscriptionsPage() {
                         </Badge>
                       ))}
                       <div className="flex items-center text-sm text-muted-foreground">
-                        <CalendarIcon className="h-4 w-4 mr-1" />
+                        <CalendarIcon className="h-4 w-4 mr-1 flex-shrink-0" />
                         {newsletter.frequency}
                       </div>
                     </div>

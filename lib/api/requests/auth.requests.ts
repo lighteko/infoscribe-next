@@ -2,7 +2,6 @@ import { apiClient } from "@api/client";
 import { LogInRequest, SignUpRequest } from "@api/types/auth.types";
 
 export function signUp(payload: SignUpRequest) {
-  console.log(payload);
   return apiClient("/auth/signup", {
     method: "POST",
     body: JSON.stringify(payload),

@@ -1,21 +1,67 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { logIn } from "@/lib/api/requests/auth.requests";
 import { Brain } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
-    const formData = new FormData(e.target as HTMLFormElement);
-    const values = Object.fromEntries(formData.entries());
-    await logIn({
-      email: values.email as string,
-      password: values.password as string,
-    });
+    try {
+      const formData = new FormData(e.target as HTMLFormElement);
+      const values = Object.fromEntries(formData.entries());
+
+      await logIn({
+        email: values.email as string,
+        password: values.password as string,
+      });
+
+      router.push("/dashboard");
+    } catch (err) {
+      if (err instanceof Error && "response" in (err as any)) {
+        const response = (err as any).response;
+        const status = response?.status;
+
+        if (status === 401) {
+          setError("Invalid email or password. Please try again.");
+        } else if (status === 429) {
+          setError("Too many login attempts. Please try again later.");
+        } else if (status === 400) {
+          setError("Invalid login details. Please check and try again.");
+        } else if (status >= 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          const data = response?.data || {};
+          setError(data.message || "Login failed. Please try again.");
+        }
+      } else if (err instanceof Error) {
+        if (
+          err.message.includes("network") ||
+          err.message.toLowerCase().includes("fetch")
+        ) {
+          setError(
+            "Network error. Please check your connection and try again."
+          );
+        } else {
+          setError(`Login failed: ${err.message}`);
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,6 +73,12 @@ export default function Login() {
         </div>
 
         <h1 className="text-2xl font-bold mb-6">Welcome back</h1>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -82,8 +134,9 @@ export default function Login() {
           <Button
             type="submit"
             className="w-full mt-6 bg-[#F2F3D9] text-[#030027] hover:bg-[#F2F3D9]/90"
+            disabled={isLoading}
           >
-            Log In
+            {isLoading ? "Logging in..." : "Log In"}
           </Button>
         </form>
 

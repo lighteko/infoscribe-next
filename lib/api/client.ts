@@ -12,7 +12,8 @@ export async function apiClient<T>(
   });
 
   if (!res.ok) {
-    throw new Error("Failed to call API");
+    const response = await res.json();
+    throw new Error(response.data.message.split("Error: ")[1]);
   }
 
   return res.json();

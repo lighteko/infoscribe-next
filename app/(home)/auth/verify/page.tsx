@@ -28,7 +28,7 @@ export default function VerifyEmail() {
       try {
         await verifyEmail({ token: verificationToken });
         setSuccess(true);
-        
+
         // Redirect to login after successful verification
         setTimeout(() => {
           router.push("/auth/login");
@@ -36,9 +36,13 @@ export default function VerifyEmail() {
       } catch (error) {
         console.error("Email verification error:", error);
         if (error instanceof Error) {
-          setError(error.message || "Failed to verify email. Please try again.");
+          setError(
+            error.message || "Failed to verify email. Please try again."
+          );
         } else {
-          setError("An unexpected error occurred. Your verification link may have expired.");
+          setError(
+            "An unexpected error occurred. Your verification link may have expired."
+          );
         }
       } finally {
         setIsLoading(false);
@@ -57,7 +61,7 @@ export default function VerifyEmail() {
         </div>
 
         <h1 className="text-2xl font-bold mb-2">Email Verification</h1>
-        
+
         {isLoading ? (
           <div className="flex flex-col items-center justify-center mt-6">
             <Loader2 className="h-8 w-8 text-[#FFB800] animate-spin mb-4" />
@@ -69,10 +73,7 @@ export default function VerifyEmail() {
               <p>Your email has been successfully verified!</p>
               <p className="text-sm mt-2">Redirecting you to login page...</p>
             </div>
-            <Link 
-              href="/auth/login" 
-              className="text-[#FFB800] hover:underline"
-            >
+            <Link href="/auth/login" className="text-[#FFB800] hover:underline">
               Click here if you're not redirected automatically
             </Link>
           </div>
@@ -83,10 +84,22 @@ export default function VerifyEmail() {
             </div>
             <div className="mt-4">
               <p className="text-sm text-muted-foreground">
-                Need help? <Link href="/contact" className="text-[#FFB800] hover:underline">Contact support</Link>
+                Need help?{" "}
+                <Link
+                  href="/contact"
+                  className="text-[#FFB800] hover:underline"
+                >
+                  Contact support
+                </Link>
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Already verified? <Link href="/auth/login" className="text-[#FFB800] hover:underline">Log in here</Link>
+                Already verified?{" "}
+                <Link
+                  href="/auth/login"
+                  className="text-[#FFB800] hover:underline"
+                >
+                  Log in here
+                </Link>
               </p>
             </div>
           </div>

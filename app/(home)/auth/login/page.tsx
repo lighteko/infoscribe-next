@@ -1,25 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { logIn } from "@/lib/api/requests/auth.requests";
 import { Brain } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 export default function Login() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { accessToken, isAuthenticated } = useAuthStore();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  // Check for existing token on component mount and redirect if authenticated
+  useEffect(() => {
+    if (accessToken && isAuthenticated) {
+      router.push("/dashboard"); // Redirect to dashboard or another protected route
+    }
+  }, [accessToken, isAuthenticated, router]);
+
+  // If we're still checking authentication or redirecting, show minimal loading state
+  if (accessToken && isAuthenticated) {
+    return (
+      <main className="min-h-[calc(100vh-5rem)] bg-gradient-to-b from-background to-secondary flex items-center justify-center p-4">
+        <div>Redirecting to dashboard...</div>
+      </main>
+    );
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setError(null);
+    setIsLoading(true);
 
     try {
-      const formData = new FormData(e.target as HTMLFormElement);
+      const formData = new FormData(event.target as HTMLFormElement);
       const values = Object.fromEntries(formData.entries());
 
       await logIn({
@@ -29,10 +47,9 @@ export default function Login() {
       });
 
       router.push("/dashboard");
-    } catch (err) {
-      if (err instanceof Error && "response" in (err as any)) {
-        const response = (err as any).response;
-        const status = response?.status;
+    } catch (err: any) {
+      if (err.response) {
+        const { status, response } = err;
 
         if (status === 401) {
           setError("Invalid email or password. Please try again.");

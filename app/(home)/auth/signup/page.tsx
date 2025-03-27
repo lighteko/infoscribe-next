@@ -102,11 +102,22 @@ export default function SignUp() {
 
         {success && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-            Account created successfully! You can now{" "}
-            <Link href="/auth/login" className="underline font-medium">
-              log in
-            </Link>
-            .
+            <p className="font-medium mb-1">Account created successfully!</p>
+            <p>
+              Please check your email inbox for an activation link. You'll need
+              to activate your account before you can log in.
+            </p>
+            <p className="text-sm mt-2">
+              Don't see the email? Check your spam folder or{" "}
+              <button
+                type="button"
+                onClick={() => setSuccess(false)}
+                className="underline font-medium"
+              >
+                try signing up again
+              </button>
+              .
+            </p>
           </div>
         )}
 

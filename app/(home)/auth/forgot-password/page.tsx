@@ -37,7 +37,10 @@ export default function ForgotPassword() {
     } catch (error) {
       console.error("Password reset error:", error);
       if (error instanceof Error) {
-        setError(error.message || "Failed to send reset instructions. Please try again.");
+        setError(
+          error.message ||
+            "Failed to send reset instructions. Please try again."
+        );
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
@@ -61,13 +64,21 @@ export default function ForgotPassword() {
         </p>
 
         {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span className="block sm:inline">Password reset instructions sent! Check your email.</span>
+          <div
+            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+            role="alert"
+          >
+            <span className="block sm:inline">
+              Password reset instructions sent! Check your email.
+            </span>
           </div>
         )}
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+            role="alert"
+          >
             <span className="block sm:inline">{error}</span>
           </div>
         )}

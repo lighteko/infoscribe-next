@@ -25,6 +25,7 @@ export default function Login() {
       await logIn({
         email: values.email as string,
         password: values.password as string,
+        isSessionOnly: values.remember ? false : true,
       });
 
       router.push("/dashboard");
@@ -114,6 +115,7 @@ export default function Login() {
               <input
                 id="remember"
                 type="checkbox"
+                name="remember"
                 className="rounded border-gray-300 text-[#FFB800] focus:ring-[#FFB800]"
               />
               <label
@@ -124,7 +126,7 @@ export default function Login() {
               </label>
             </div>
             <Link
-              href="/forgot-password"
+              href="/auth/forgot-password"
               className="text-sm text-[#FFB800] hover:underline"
             >
               Forgot password?
@@ -142,7 +144,7 @@ export default function Login() {
 
         <p className="text-center text-sm text-muted-foreground mt-6">
           Don't have an account?{" "}
-          <Link href="/signup" className="text-[#FFB800] hover:underline">
+          <Link href="/auth/signup" className="text-[#FFB800] hover:underline">
             Sign up
           </Link>
         </p>

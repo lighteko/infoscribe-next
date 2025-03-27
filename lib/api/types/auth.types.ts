@@ -9,4 +9,19 @@ export interface SignUpRequest {
 export interface LogInRequest {
   email: string;
   password: string;
+  isSessionOnly: boolean;
+}
+
+export interface PasswordResetValidation {
+  email: string;
+  username: string;
+}
+
+export interface PasswordResetRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface EmailVerificationRequest {
+  token: string;
 }

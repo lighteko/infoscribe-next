@@ -28,7 +28,7 @@ export default function Home() {
           Infoscribe automatically summarizes the latest news in your chosen
           categories and delivers a curated newsletter to your inbox.
         </p>
-        <Link href="/auth/signup">
+        <Link href="/signup">
           <Button
             size="lg"
             className="mt-8 bg-[#F2F3D9] text-[#030027] hover:bg-[#F2F3D9]/90"
@@ -191,7 +191,7 @@ export default function Home() {
             Join thousands of users who are already saving time and staying
             informed with Infoscribe.
           </p>
-          <Link href="/auth/signup">
+          <Link href="/signup">
             <Button
               size="lg"
               className="bg-[#030027] text-[#F2F3D9] hover:bg-[#030027]/90"

@@ -103,7 +103,7 @@ export default function SignUp() {
         {success && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
             Account created successfully! You can now{" "}
-            <Link href="/auth/login" className="underline font-medium">
+            <Link href="/login" className="underline font-medium">
               log in
             </Link>
             .
@@ -238,7 +238,7 @@ export default function SignUp() {
 
         <p className="text-center text-sm text-muted-foreground mt-6">
           Already have an account?{" "}
-          <Link href="/auth/login" className="text-[#FFB800] hover:underline">
+          <Link href="/login" className="text-[#FFB800] hover:underline">
             Log in
           </Link>
         </p>

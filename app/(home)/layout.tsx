@@ -15,10 +15,10 @@ export default function UserLayout({
           <span className="text-2xl font-bold">Infoscribe</span>
         </Link>
         <div className="flex gap-4">
-          <Link href="/auth/login">
+          <Link href="/login">
             <Button variant="ghost">Log in</Button>
           </Link>
-          <Link href="/auth/signup">
+          <Link href="/signup">
             <Button className="bg-[#F2F3D9] text-[#030027] hover:bg-[#F2F3D9]/90">
               Get Started
             </Button>

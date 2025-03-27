@@ -124,7 +124,7 @@ export default function Login() {
               </label>
             </div>
             <Link
-              href="/auth/forgot-password"
+              href="/forgot-password"
               className="text-sm text-[#FFB800] hover:underline"
             >
               Forgot password?
@@ -142,7 +142,7 @@ export default function Login() {
 
         <p className="text-center text-sm text-muted-foreground mt-6">
           Don't have an account?{" "}
-          <Link href="/auth/signup" className="text-[#FFB800] hover:underline">
+          <Link href="/signup" className="text-[#FFB800] hover:underline">
             Sign up
           </Link>
         </p>

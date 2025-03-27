@@ -1,4 +1,5 @@
-import { apiClient } from "@api/client";
+import { apiClient } from "@/lib/api/client";
+import { useAuthStore } from "@/lib/store/auth-store";
 import {
   EmailVerificationRequest,
   LogInRequest,
@@ -14,24 +15,34 @@ export function signUp(payload: SignUpRequest) {
   });
 }
 
+// Updated login to use Basic Authentication
 export async function logIn(payload: LogInRequest) {
-  const encodedCredentials = Buffer.from(
-    `${payload.email}:${payload.password}`
-  ).toString("base64");
+  // Create base64 encoded credentials for Basic Authentication
+  const credentials = btoa(`${payload.email}:${payload.password}`);
+
   return apiClient("/auth/login", {
     method: "POST",
     headers: {
-      Authorization: `Basic ${encodedCredentials}`,
+      Authorization: `Basic ${credentials}`,
     },
     body: JSON.stringify({
       isSessionOnly: payload.isSessionOnly,
     }),
+  }).then((response) => {
+    // Store the access token in Zustand
+    useAuthStore
+      .getState()
+      .login(response.data.accessToken, response.data.user);
+    return response;
   });
 }
 
 export async function logout() {
   return apiClient("/auth/logout", {
     method: "POST",
+  }).finally(() => {
+    // Clear auth state
+    useAuthStore.getState().logout();
   });
 }
 
@@ -49,15 +60,29 @@ export async function resetPassword(payload: PasswordResetRequest) {
   });
 }
 
+// Refresh token function
 export async function refreshToken() {
   return apiClient("/auth/refresh", {
     method: "POST",
+  }).then((response) => {
+    // Update the access token in Zustand
+    useAuthStore.getState().setAccessToken(response.data.accessToken);
+    return response;
   });
 }
 
+// Updated to handle access token from verification response
 export async function verifyEmail(payload: EmailVerificationRequest) {
   return apiClient("/auth/verify", {
     method: "POST",
     body: JSON.stringify(payload),
+  }).then((response) => {
+    // If response contains access token, store it
+    if (response.data?.accessToken) {
+      useAuthStore
+        .getState()
+        .login(response.data.accessToken, response.data.user || null);
+    }
+    return response;
   });
 }

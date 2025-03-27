@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { refreshToken } from "@/lib/api/requests/auth.requests";
 
 interface AuthState {
   accessToken: string | null;

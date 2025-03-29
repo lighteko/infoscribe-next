@@ -16,7 +16,7 @@ export async function apiClient(path: string, options?: RequestInit) {
     ] = `Bearer ${accessToken}`;
   }
 
-  const res = await fetch(`http://localhost:8000${path}`, {
+  const res = await fetch(`https://api.infoscribe.me${path}`, {
     ...options,
     headers,
     credentials: "include", // Keep this for refresh token cookie

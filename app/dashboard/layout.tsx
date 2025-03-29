@@ -14,7 +14,7 @@ import {
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { logout } from "@/lib/api/requests/auth.requests";
+import { logOut } from "@/lib/api/requests/auth.requests";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
@@ -108,7 +108,7 @@ export default function DashboardLayout({
                 size="icon"
                 className="ml-2"
                 onClick={async () => {
-                  await logout();
+                  await logOut();
                   router.replace("/");
                 }}
               >

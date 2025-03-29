@@ -7,16 +7,25 @@ import { Card } from "@/components/ui/card";
 import { resetPassword } from "@/lib/api/requests/auth.requests";
 import { Brain, Loader2, EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
+import { usePasswordStrength } from "@/hooks/use-password-strength";
 
 export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+
+  // Use our custom hook for password strength
+  const {
+    passwordStrength,
+    error: passwordError,
+    validatePasswordStrength,
+    checkPasswordStrength,
+  } = usePasswordStrength();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -25,7 +34,7 @@ export default function ResetPassword() {
   useEffect(() => {
     const tokenFromUrl = searchParams.get("token");
     if (!tokenFromUrl) {
-      setError(
+      setFormError(
         "Missing reset token. Please request a new password reset link."
       );
     } else {
@@ -37,14 +46,22 @@ export default function ResetPassword() {
   const toggleShowConfirmPassword = () =>
     setShowConfirmPassword(!showConfirmPassword);
 
+  const handlePasswordChange = (newPassword: string) => {
+    setPassword(newPassword);
+    checkPasswordStrength(newPassword);
+  };
+
   const validatePassword = () => {
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
+    // First check password strength
+    const strengthCheck = validatePasswordStrength(password);
+    if (!strengthCheck.isValid) {
+      setFormError(strengthCheck.message);
       return false;
     }
 
+    // Then check if passwords match
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setFormError("Passwords do not match");
       return false;
     }
 
@@ -54,7 +71,7 @@ export default function ResetPassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
+    setFormError(null);
     setSuccess(false);
 
     if (!validatePassword()) {
@@ -63,7 +80,7 @@ export default function ResetPassword() {
     }
 
     if (!token) {
-      setError(
+      setFormError(
         "Reset token is missing. Please request a new password reset link."
       );
       setIsLoading(false);
@@ -84,11 +101,11 @@ export default function ResetPassword() {
     } catch (error) {
       console.error("Password reset error:", error);
       if (error instanceof Error) {
-        setError(
+        setFormError(
           error.message || "Failed to reset password. Please try again."
         );
       } else {
-        setError(
+        setFormError(
           "An unexpected error occurred. Your reset link may have expired."
         );
       }
@@ -121,12 +138,12 @@ export default function ResetPassword() {
           </div>
         )}
 
-        {error && (
+        {formError && (
           <div
             className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
             role="alert"
           >
-            <span className="block sm:inline">{error}</span>
+            <span className="block sm:inline">{formError}</span>
           </div>
         )}
 
@@ -140,9 +157,9 @@ export default function ResetPassword() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => handlePasswordChange(e.target.value)}
                 required
-                className="w-full px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
+                className="w-full px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-[#FFB800] pr-10"
                 placeholder="Enter your new password"
                 disabled={isLoading || !token}
               />
@@ -158,6 +175,20 @@ export default function ResetPassword() {
                 )}
               </button>
             </div>
+            {passwordStrength && passwordStrength.isValid && (
+              <p
+                className={`text-sm ${
+                  passwordStrength.score === 4
+                    ? "text-green-500"
+                    : "text-amber-500"
+                }`}
+              >
+                {passwordStrength.message}
+              </p>
+            )}
+            {passwordError && (
+              <p className="text-red-500 text-sm">{passwordError}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -171,7 +202,7 @@ export default function ResetPassword() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
+                className="w-full px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-[#FFB800] pr-10"
                 placeholder="Confirm your new password"
                 disabled={isLoading || !token}
               />

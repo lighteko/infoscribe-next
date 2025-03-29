@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuthStore } from "@/lib/store/auth-store";
+import { refreshToken } from "@/lib/api/requests/auth.requests";
 import {
   Clock,
   Filter,
@@ -16,6 +19,28 @@ import {
 import Link from "next/link";
 
 export default function Home() {
+  const { isAuthenticated, accessToken } = useAuthStore();
+  const [_, setAuthChecked] = useState(false);
+
+  // Check if we need to refresh the token
+  useEffect(() => {
+    const checkAndRefreshToken = async () => {
+      if (!accessToken) {
+        try {
+          await refreshToken();
+        } catch (error) {
+          console.error("Failed to refresh token:", error);
+        } finally {
+          setAuthChecked(true);
+        }
+      } else {
+        setAuthChecked(true);
+      }
+    };
+
+    checkAndRefreshToken();
+  }, [accessToken]);
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary">
       {/* Hero Section */}
@@ -28,12 +53,12 @@ export default function Home() {
           Infoscribe automatically summarizes the latest news in your chosen
           categories and delivers a curated newsletter to your inbox.
         </p>
-        <Link href="/auth/signup">
+        <Link href={isAuthenticated ? "/dashboard" : "/auth/signup"}>
           <Button
             size="lg"
             className="mt-8 bg-[#F2F3D9] text-[#030027] hover:bg-[#F2F3D9]/90"
           >
-            Get Started for Free
+            {isAuthenticated ? "Go to Dashboard" : "Get Started for Free"}
           </Button>
         </Link>
       </section>
@@ -185,18 +210,20 @@ export default function Home() {
         <Card className="max-w-4xl mx-auto p-12 bg-[#F2F3D9] text-[#030027]">
           <Users className="w-16 h-16 mx-auto mb-8 text-[#FFB800]" />
           <h2 className="text-3xl font-bold mb-4">
-            Sign up today and let Infoscribe be your AI-powered news assistant!
+            {isAuthenticated
+              ? "Continue managing your AI-powered news assistant!"
+              : "Sign up today and let Infoscribe be your AI-powered news assistant!"}
           </h2>
           <p className="text-xl mb-8 opacity-90">
             Join thousands of users who are already saving time and staying
             informed with Infoscribe.
           </p>
-          <Link href="/auth/signup">
+          <Link href={isAuthenticated ? "/dashboard" : "/auth/signup"}>
             <Button
               size="lg"
               className="bg-[#030027] text-[#F2F3D9] hover:bg-[#030027]/90"
             >
-              Get Started for Free
+              {isAuthenticated ? "Go to Dashboard" : "Get Started for Free"}
             </Button>
           </Link>
         </Card>

@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api/client";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { useAuthSettingsStore, useAuthStore } from "@/lib/store/auth-store";
 import {
   EmailVerificationRequest,
   LogInRequest,
@@ -32,14 +32,22 @@ export async function logIn(payload: LogInRequest) {
     // Store the access token in Zustand
     useAuthStore
       .getState()
-      .login(response.data.accessToken, response.data.user);
+      .login(
+        response.data.accessToken,
+        response.data.user,
+        !payload.isSessionOnly
+      );
     return response;
   });
 }
 
-export async function logout() {
+export async function logOut() {
+  console.log(useAuthStore.getState());
   return apiClient("/auth/logout", {
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${useAuthStore.getState().accessToken}`,
+    },
   }).finally(() => {
     // Clear auth state
     useAuthStore.getState().logout();
@@ -64,9 +72,12 @@ export async function resetPassword(payload: PasswordResetRequest) {
 export async function refreshToken() {
   return apiClient("/auth/refresh", {
     method: "POST",
+    body: JSON.stringify({
+      isSessionOnly: !useAuthSettingsStore.getState().isPersistent,
+    }),
   }).then((response) => {
     // Update the access token in Zustand
-    useAuthStore.getState().setAccessToken(response.data.accessToken);
+    useAuthStore.getState().setAccessToken(response.data.accessToken as string);
     return response;
   });
 }

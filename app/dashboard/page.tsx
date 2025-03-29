@@ -12,6 +12,8 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
+import { useEffect, useRef } from "react";
+import { refreshToken } from "@/lib/api/requests/auth.requests";
 
 interface Newsletter {
   id: string;
@@ -55,6 +57,32 @@ const newsletters: Newsletter[] = [
 export default function DashboardPage() {
   // Require authentication for this page
   const { user } = useAuth({ requireAuth: true });
+  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Set up automatic token refresh
+  useEffect(() => {
+    // Function to check and refresh token
+    const checkAndRefreshToken = async () => {
+      try {
+        await refreshToken();
+      } catch (error) {
+        console.error("Failed to refresh token:", error);
+      }
+    };
+
+    // Initial check
+    checkAndRefreshToken();
+
+    // Set up periodic checks (e.g., every 5 minutes)
+    refreshTimerRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000);
+
+    // Clean up the timer when component unmounts
+    return () => {
+      if (refreshTimerRef.current) {
+        clearInterval(refreshTimerRef.current);
+      }
+    };
+  }, [refreshToken]);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">

@@ -4,8 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EnvelopeIcon, UserGroupIcon, InboxIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import {
+  EnvelopeIcon,
+  UserGroupIcon,
+  InboxIcon,
+  FunnelIcon,
+} from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { useAuth } from "@/hooks/use-auth";
+import { useEffect, useRef } from "react";
+import { refreshToken } from "@/lib/api/requests/auth.requests";
 
 interface Newsletter {
   id: string;
@@ -20,30 +28,62 @@ const newsletters: Newsletter[] = [
   {
     id: "1",
     title: "Tech Insights Weekly",
-    content: "This week in tech: Major advancements in quantum computing, Apple's new product announcements, and how AI is transforming healthcare. Plus, a deep dive into the latest cybersecurity threats.",
+    content:
+      "This week in tech: Major advancements in quantum computing, Apple's new product announcements, and how AI is transforming healthcare. Plus, a deep dive into the latest cybersecurity threats.",
     timestamp: "2h ago",
     categories: ["Technology", "AI"],
-    isRead: false
+    isRead: false,
   },
   {
     id: "2",
     title: "Finance Digest",
-    content: "Market analysis: Global markets show signs of recovery as inflation rates stabilize. Our experts analyze the impact of recent policy changes and provide insights on emerging investment opportunities.",
+    content:
+      "Market analysis: Global markets show signs of recovery as inflation rates stabilize. Our experts analyze the impact of recent policy changes and provide insights on emerging investment opportunities.",
     timestamp: "1d ago",
     categories: ["Finance", "Markets"],
-    isRead: false
+    isRead: false,
   },
   {
     id: "3",
     title: "Health & Wellness Update",
-    content: "Latest health research: New studies reveal the benefits of intermittent fasting, mindfulness practices for stress reduction, and breakthrough treatments for chronic conditions. Plus, seasonal wellness tips.",
+    content:
+      "Latest health research: New studies reveal the benefits of intermittent fasting, mindfulness practices for stress reduction, and breakthrough treatments for chronic conditions. Plus, seasonal wellness tips.",
     timestamp: "3d ago",
     categories: ["Health", "Wellness"],
-    isRead: false
-  }
+    isRead: false,
+  },
 ];
 
 export default function DashboardPage() {
+  // Require authentication for this page
+  const { user } = useAuth({ requireAuth: true });
+  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Set up automatic token refresh
+  useEffect(() => {
+    // Function to check and refresh token
+    const checkAndRefreshToken = async () => {
+      try {
+        await refreshToken();
+      } catch (error) {
+        console.error("Failed to refresh token:", error);
+      }
+    };
+
+    // Initial check
+    checkAndRefreshToken();
+
+    // Set up periodic checks (e.g., every 5 minutes)
+    refreshTimerRef.current = setInterval(checkAndRefreshToken, 5 * 60 * 1000);
+
+    // Clean up the timer when component unmounts
+    return () => {
+      if (refreshTimerRef.current) {
+        clearInterval(refreshTimerRef.current);
+      }
+    };
+  }, [refreshToken]);
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -86,7 +126,9 @@ export default function DashboardPage() {
           </div>
           <div className="mt-3">
             <p className="text-2xl font-bold">7</p>
-            <p className="text-xs text-muted-foreground">3 new since yesterday</p>
+            <p className="text-xs text-muted-foreground">
+              3 new since yesterday
+            </p>
           </div>
         </Card>
       </div>
@@ -152,4 +194,4 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-} 
+}

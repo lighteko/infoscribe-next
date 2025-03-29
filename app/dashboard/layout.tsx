@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
@@ -14,6 +14,7 @@ import {
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { logOut } from "@/lib/api/requests/auth.requests";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
@@ -31,13 +32,14 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen h-screen overflow-hidden">
       {/* Mobile sidebar */}
-      <div 
+      <div
         className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 md:hidden ${
           mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
@@ -45,9 +47,11 @@ export default function DashboardLayout({
       />
 
       {/* Sidebar for both mobile and desktop */}
-      <div 
+      <div
         className={`fixed md:sticky md:top-0 md:flex md:w-64 md:flex-col h-screen z-50 transition-transform duration-300 ease-in-out bg-background border-r ${
-          mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          mobileMenuOpen
+            ? "translate-x-0"
+            : "-translate-x-full md:translate-x-0"
         }`}
       >
         <div className="flex flex-col h-full overflow-hidden">
@@ -55,10 +59,10 @@ export default function DashboardLayout({
             <Link href="/dashboard" className="flex items-center space-x-2">
               <span className="text-xl font-bold">Infoscribe</span>
             </Link>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="md:hidden" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
               onClick={() => setMobileMenuOpen(false)}
             >
               <XMarkIcon className="h-5 w-5" />
@@ -69,7 +73,11 @@ export default function DashboardLayout({
               {navigation.map((item) => {
                 const isActive = pathname === item.href;
                 return (
-                  <Link key={item.name} href={item.href} onClick={() => setMobileMenuOpen(false)}>
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     <Button
                       variant={isActive ? "secondary" : "ghost"}
                       className="w-full justify-start"
@@ -99,7 +107,10 @@ export default function DashboardLayout({
                 variant="ghost"
                 size="icon"
                 className="ml-2"
-                onClick={() => window.location.href = '/'}
+                onClick={async () => {
+                  await logOut();
+                  router.replace("/");
+                }}
               >
                 <ArrowRightStartOnRectangleIcon className="h-5 w-5" />
               </Button>
@@ -112,15 +123,20 @@ export default function DashboardLayout({
       <div className="flex flex-col flex-1 overflow-hidden">
         <div className="border-b sticky top-0 bg-background z-10">
           <div className="flex h-16 items-center px-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="md:hidden mr-2"
               onClick={() => setMobileMenuOpen(true)}
             >
               <Bars3Icon className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" asChild className="hidden md:flex">
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="hidden md:flex"
+            >
               <Link href="/dashboard">
                 <ArrowLeftIcon className="h-5 w-5" />
               </Link>

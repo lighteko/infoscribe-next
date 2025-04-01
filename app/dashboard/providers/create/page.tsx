@@ -7,138 +7,371 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
+import {
+  QuestionMarkCircleIcon,
+  PlusIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 
-const categories = [
-  "Technology",
-  "Finance",
-  "Health",
-  "Business",
-  "Science",
-  "Entertainment",
-  "Sports",
-  "Politics",
-  "Education",
-  "Environment",
-  "AI",
-  "Lifestyle"
-];
-
-const frequencies = [
-  { value: "daily", label: "Daily" },
-  { value: "weekly", label: "Weekly" },
-  { value: "biweekly", label: "Bi-weekly" },
-  { value: "monthly", label: "Monthly" }
+// Days of the week for weekly dispatches (3-letter abbreviations)
+const weekdays = [
+  { value: "MON", label: "Monday" },
+  { value: "TUE", label: "Tuesday" },
+  { value: "WED", label: "Wednesday" },
+  { value: "THU", label: "Thursday" },
+  { value: "FRI", label: "Friday" },
+  { value: "SAT", label: "Saturday" },
+  { value: "SUN", label: "Sunday" },
 ];
 
 export default function CreateProviderPage() {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState<string>("");
+  const [selectedDay, setSelectedDay] = useState<string>("");
 
-  const handleCategoryClick = (category: string) => {
-    setSelectedCategories(prev => {
-      if (prev.includes(category)) {
-        return prev.filter(c => c !== category);
-      }
-      if (prev.length >= 2) {
-        return prev;
-      }
-      return [...prev, category];
-    });
+  const handleAddTag = () => {
+    const trimmedTag = tagInput.trim();
+    if (
+      trimmedTag &&
+      tags.length < 2 &&
+      !tags.includes(trimmedTag) &&
+      trimmedTag.length <= 15
+    ) {
+      setTags([...tags, trimmedTag]);
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setTags(tags.filter((t) => t !== tag));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
+
+  const handleTagInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only update if the input is <= 15 characters
+    if (e.target.value.length <= 15) {
+      setTagInput(e.target.value);
+    }
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+
+    // Clear error when field is edited
+    if (errors[id]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[id];
+        return newErrors;
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Provider name is required";
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "Description is required";
+    } else if (formData.description.trim().length < 20) {
+      newErrors.description = "Description should be at least 20 characters";
+    }
+
+    if (tags.length === 0) {
+      newErrors.tags = "At least one tag is required";
+    }
+
+    if (!selectedDay) {
+      newErrors.day = "Please select a sending day";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      toast({
+        title: "Error",
+        description: "Please fix the errors before submitting",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // Prepare data for submission
+      const providerData = {
+        name: formData.name,
+        description: formData.description,
+        tags,
+        sendingDay: selectedDay,
+      };
+
+      // Simulate API call
+      console.log("Submitting provider data:", providerData);
+
+      // Here you would add your actual API call
+      // await fetch('/api/providers', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(providerData)
+      // });
+
+      // For demo purposes, we'll just wait 1 second
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      toast({
+        title: "Success",
+        description: "Provider created successfully!",
+      });
+
+      // Redirect to providers list
+      router.push("/dashboard/providers");
+    } catch (error) {
+      console.error("Error creating provider:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create provider. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Create New Provider</h2>
+        <h2 className="text-3xl font-bold tracking-tight">
+          Create New Provider
+        </h2>
       </div>
 
-      <Card>
-        <CardContent className="p-6">
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-lg font-semibold">Provider Details</h3>
-              <p className="text-sm text-muted-foreground">
-                Fill in the details for your new newsletter provider.
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Provider Name</Label>
-                <Input
-                  id="name"
-                  placeholder="e.g., Tech Insights Weekly"
-                />
+      <form onSubmit={handleSubmit}>
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-lg font-semibold">Provider Details</h3>
+                <p className="text-sm text-muted-foreground">
+                  Fill in the details for your new newsletter provider.
+                </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe what your newsletter is about..."
-                  className="min-h-[100px]"
-                />
-              </div>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="name"
+                    className={errors.name ? "text-destructive" : ""}
+                  >
+                    Provider Name
+                  </Label>
+                  <Input
+                    id="name"
+                    placeholder="e.g., Tech Insights Weekly"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className={errors.name ? "border-destructive" : ""}
+                  />
+                  {errors.name && (
+                    <p className="text-xs text-destructive mt-1">
+                      {errors.name}
+                    </p>
+                  )}
+                </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Label>Categories (Select up to 2)</Label>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="description"
+                    className={errors.description ? "text-destructive" : ""}
+                  >
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe what your newsletter is about..."
+                    className={`min-h-[100px] ${
+                      errors.description ? "border-destructive" : ""
+                    }`}
+                    value={formData.description}
+                    onChange={handleInputChange}
+                  />
+                  {errors.description && (
+                    <p className="text-xs text-destructive mt-1">
+                      {errors.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Label className={errors.tags ? "text-destructive" : ""}>
+                        Tags (Free plan: up to 2)
+                      </Label>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-4 w-4 text-muted-foreground"
+                        type="button"
+                      >
+                        <QuestionMarkCircleIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {tags.length}/2 added
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
+                    {tags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="outline"
+                        className="text-xs py-0.5 pl-2 pr-1 flex items-center gap-1 h-7 bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
+                      >
+                        {tag}
+                        <XMarkIcon
+                          className="h-3 w-3 cursor-pointer hover:text-red-500 transition-colors"
+                          onClick={() => handleRemoveTag(tag)}
+                          title={`Remove ${tag} tag`}
+                          aria-label={`Remove ${tag} tag`}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        value={tagInput}
+                        onChange={handleTagInput}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Enter a keyword tag..."
+                        disabled={tags.length >= 2}
+                        className={`h-9 pr-14 ${
+                          errors.tags ? "border-destructive" : ""
+                        }`}
+                        maxLength={15}
+                      />
+                      {tagInput && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                          {tagInput.length}/15
+                        </span>
+                      )}
+                    </div>
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-4 w-4 text-muted-foreground"
+                      onClick={handleAddTag}
+                      disabled={
+                        tags.length >= 2 ||
+                        !tagInput.trim() ||
+                        tagInput.length > 15
+                      }
+                      type="button"
+                      size="sm"
+                      className="h-9 px-3"
                     >
-                      <QuestionMarkCircleIcon className="h-4 w-4" />
+                      <PlusIcon className="h-3.5 w-3.5 mr-1" /> Add
                     </Button>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    {selectedCategories.length}/2 selected
-                  </span>
+                  {errors.tags && (
+                    <p className="text-xs text-destructive mt-1">
+                      {errors.tags}
+                    </p>
+                  )}
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((category) => (
-                    <Badge
-                      key={category}
-                      variant={selectedCategories.includes(category) ? "default" : "outline"}
-                      className={`cursor-pointer transition-none ${
-                        selectedCategories.length >= 2 && !selectedCategories.includes(category)
-                          ? "opacity-50 cursor-not-allowed"
-                          : "hover:bg-primary hover:text-primary-foreground"
-                      }`}
-                      onClick={() => handleCategoryClick(category)}
-                    >
-                      {category}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label>Sending Frequency</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select frequency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {frequencies.map((frequency) => (
-                      <SelectItem key={frequency.value} value={frequency.value}>
-                        {frequency.label}
-                      </SelectItem>
+                <div className="space-y-2">
+                  <Label className={errors.day ? "text-destructive" : ""}>
+                    Sending Day (Weekly)
+                  </Label>
+                  <div className="flex flex-wrap gap-2 mt-1.5">
+                    {weekdays.map((day) => (
+                      <Button
+                        key={day.value}
+                        type="button"
+                        size="sm"
+                        variant={
+                          selectedDay === day.value ? "default" : "outline"
+                        }
+                        className={`px-3 py-1 h-8 transition-all ${
+                          selectedDay === day.value
+                            ? "bg-primary text-primary-foreground"
+                            : errors.day
+                            ? "border-destructive text-destructive hover:bg-destructive/10"
+                            : "hover:bg-slate-100"
+                        }`}
+                        onClick={() => {
+                          setSelectedDay(day.value);
+                          if (errors.day) {
+                            setErrors((prev) => {
+                              const newErrors = { ...prev };
+                              delete newErrors.day;
+                              return newErrors;
+                            });
+                          }
+                        }}
+                      >
+                        {day.value}
+                      </Button>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                  {errors.day && (
+                    <p className="text-xs text-destructive mt-1">
+                      {errors.day}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Newsletters are dispatched weekly on your selected day.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4">
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => router.push("/dashboard/providers")}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Creating..." : "Create Provider"}
+                </Button>
               </div>
             </div>
-
-            <div className="flex justify-end space-x-4">
-              <Button variant="outline">Cancel</Button>
-              <Button>Create Provider</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </form>
     </div>
   );
-} 
+}

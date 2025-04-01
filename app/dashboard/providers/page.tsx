@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 interface Provider {
   id: string;
@@ -18,12 +19,13 @@ const providers: Provider[] = [
   {
     id: "1",
     name: "Tech Insights Weekly",
-    description: "A weekly digest of the latest technology news, focusing on AI advancements, software development, and tech industry trends.",
+    description:
+      "A weekly digest of the latest technology news, focusing on AI advancements, software development, and tech industry trends.",
     categories: ["Technology", "AI"],
     frequency: "Every Monday",
     subscribers: 42,
-    status: "Active"
-  }
+    status: "Active",
+  },
 ];
 
 export default function ProvidersPage() {
@@ -36,7 +38,9 @@ export default function ProvidersPage() {
             Manage your newsletter providers here.
           </p>
         </div>
-        <Button className="self-start sm:self-auto">Create Provider</Button>
+        <Link href="/dashboard/providers/create">
+          <Button className="self-start sm:self-auto">Create Provider</Button>
+        </Link>
       </div>
 
       {providers.length === 0 ? (
@@ -57,7 +61,11 @@ export default function ProvidersPage() {
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-lg font-semibold">{provider.name}</h3>
-                      <Badge variant={provider.status === "Active" ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          provider.status === "Active" ? "default" : "secondary"
+                        }
+                      >
                         {provider.status}
                       </Badge>
                     </div>
@@ -77,14 +85,30 @@ export default function ProvidersPage() {
                   </p>
                   <div className="flex items-center space-x-4">
                     <div className="text-sm">
-                      <span className="font-medium">{provider.subscribers}</span>
-                      <span className="text-muted-foreground ml-1">Subscribers</span>
+                      <span className="font-medium">
+                        {provider.subscribers}
+                      </span>
+                      <span className="text-muted-foreground ml-1">
+                        Subscribers
+                      </span>
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <Button variant="outline" size="sm" className="justify-center">View Analytics</Button>
-                  <Button variant="outline" size="sm" className="justify-center">Send Test Newsletter</Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="justify-center"
+                  >
+                    View Analytics
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="justify-center"
+                  >
+                    Send Test Newsletter
+                  </Button>
                 </div>
               </div>
             </Card>
@@ -97,7 +121,8 @@ export default function ProvidersPage() {
           <div className="space-y-2">
             <h3 className="font-semibold">Free Plan Limit Reached</h3>
             <p className="text-sm text-muted-foreground">
-              You've reached the limit of 1 provider on the free plan. Upgrade to Pro to create unlimited providers.
+              You've reached the limit of 1 provider on the free plan. Upgrade
+              to Pro to create unlimited providers.
             </p>
             <Button variant="default">Upgrade to Pro</Button>
           </div>
@@ -105,4 +130,4 @@ export default function ProvidersPage() {
       )}
     </div>
   );
-} 
+}

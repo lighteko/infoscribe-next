@@ -37,7 +37,6 @@ export function DashboardSidebar({
   onLogout
 }: SidebarProps) {
   const pathname = usePathname();
-
   return (
     <>
       {/* Mobile backdrop */}

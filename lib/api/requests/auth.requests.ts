@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/api/client";
+import { apiClient } from "@api/client";
 import { useAuthSettingsStore, useAuthStore } from "@/lib/store/auth-store";
 import {
   EmailVerificationRequest,
@@ -18,7 +18,7 @@ export function signUp(payload: SignUpRequest) {
 // Updated login to use Basic Authentication
 export async function logIn(payload: LogInRequest) {
   // Create base64 encoded credentials for Basic Authentication
-  const credentials = btoa(`${payload.email}:${payload.password}`);
+  const credentials = btoa(`${payload.email}:${payload.pwd}`);
 
   return apiClient("/auth/login", {
     method: "POST",

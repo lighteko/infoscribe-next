@@ -181,10 +181,38 @@ function useToast() {
     };
   }, [state]);
 
+  const success = (title: string, description?: string) => {
+    toast({
+      title,
+      description,
+      variant: 'default',
+    });
+  };
+
+  const error = (title: string, description?: string) => {
+    toast({
+      title,
+      description,
+      variant: 'destructive',
+    });
+  };
+
+  const warning = (title: string, description?: string) => {
+    toast({
+      title,
+      description,
+      variant: 'default',
+      // You could add a custom class or icon for warnings
+    });
+  };
+
   return {
     ...state,
     toast,
     dismiss: (toastId?: string) => dispatch({ type: 'DISMISS_TOAST', toastId }),
+    success,
+    error,
+    warning,
   };
 }
 

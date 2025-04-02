@@ -14,16 +14,19 @@ import {
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { createProvider } from "@/lib/api/requests/provider.requests";
+import { weeklyCron } from "@/lib/utils";
+import { string } from "zod";
 
 // Days of the week for weekly dispatches (3-letter abbreviations)
 const weekdays = [
+  { value: "SUN", label: "Sunday" },
   { value: "MON", label: "Monday" },
   { value: "TUE", label: "Tuesday" },
   { value: "WED", label: "Wednesday" },
   { value: "THU", label: "Thursday" },
   { value: "FRI", label: "Friday" },
   { value: "SAT", label: "Saturday" },
-  { value: "SUN", label: "Sunday" },
 ];
 
 export default function CreateProviderPage() {
@@ -130,24 +133,16 @@ export default function CreateProviderPage() {
 
       // Prepare data for submission
       const providerData = {
-        name: formData.name,
-        description: formData.description,
+        title: formData.name,
+        summary: formData.description,
         tags,
-        sendingDay: selectedDay,
+        locale: "En-US",
+        schedule: weeklyCron(selectedDay),
       };
 
-      // Simulate API call
-      console.log("Submitting provider data:", providerData);
 
-      // Here you would add your actual API call
-      // await fetch('/api/providers', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(providerData)
-      // });
 
-      // For demo purposes, we'll just wait 1 second
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await createProvider(providerData)
 
       toast({
         title: "Success",

@@ -17,7 +17,7 @@ export async function apiClient(path: string, options?: RequestInit) {
     console.log(`Request to ${path} without auth token`);
   }
   
-  const res = await fetch(`http://localhost:8000${path}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
     ...options,
     headers,
     credentials: "include" // Important for cookies/refresh tokens

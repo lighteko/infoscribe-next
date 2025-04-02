@@ -70,7 +70,7 @@ export default function SignUp() {
         username: values.username as string,
         firstName: values.firstName as string,
         lastName: values.lastName as string,
-        password: values.password as string,
+        pwd: values.password as string,
       });
 
       setSuccess(true);

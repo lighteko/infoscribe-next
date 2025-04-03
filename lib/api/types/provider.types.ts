@@ -1,11 +1,11 @@
-export interface GetProviderResponse {
-  creator: string;
+export interface ProviderResponse {
+  providerId: string;
   title: string;
   summary: string;
   schedule: string;
   locale: string;
   tags: string[];
-  createdDate: Date;
+  subscribers: number;
 }
 
 export interface CreateProviderRequest {

@@ -1,34 +1,43 @@
-"use client";
+"use client"
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-
-interface Provider {
-  id: string;
-  name: string;
-  description: string;
-  categories: string[];
-  frequency: string;
-  subscribers: number;
-  status: "Active" | "Inactive";
-}
-
-const providers: Provider[] = [
-  {
-    id: "1",
-    name: "Tech Insights Weekly",
-    description:
-      "A weekly digest of the latest technology news, focusing on AI advancements, software development, and tech industry trends.",
-    categories: ["Technology", "AI"],
-    frequency: "Every Monday",
-    subscribers: 42,
-    status: "Active",
-  },
-];
+import { ProviderResponse } from "@/lib/api/types/provider.types";
+import { getAllMyProviders } from "@/lib/api/requests/provider.requests";
+import { cron2Weekday } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export default function ProvidersPage() {
+  const [providers, setProviders] = useState<ProviderResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProviders = async () => {
+      try {
+        const response = await getAllMyProviders();
+        setProviders(response.data);
+      } catch (error) {
+        console.error("Failed to fetch providers:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProviders();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex justify-center items-center h-[400px]">
+          <p>Loading providers...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
@@ -55,33 +64,26 @@ export default function ProvidersPage() {
       ) : (
         <div className="grid gap-4">
           {providers.map((provider) => (
-            <Card key={provider.id} className="p-4 sm:p-6">
+            <Card key={provider.providerId} className="p-4 sm:p-6">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="space-y-3">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-semibold">{provider.name}</h3>
-                      <Badge
-                        variant={
-                          provider.status === "Active" ? "default" : "secondary"
-                        }
-                      >
-                        {provider.status}
-                      </Badge>
+                      <h3 className="text-lg font-semibold">{provider.title}</h3>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
-                      {provider.categories.map((category) => (
-                        <Badge key={category} variant="outline">
-                          {category}
+                      {provider.tags.map((tag) => (
+                        <Badge key={tag} variant="outline">
+                          {tag}
                         </Badge>
                       ))}
                       <span className="text-sm text-muted-foreground">
-                        • {provider.frequency}
+                        • {cron2Weekday(provider.schedule)}
                       </span>
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {provider.description}
+                    {provider.summary}
                   </p>
                   <div className="flex items-center space-x-4">
                     <div className="text-sm">

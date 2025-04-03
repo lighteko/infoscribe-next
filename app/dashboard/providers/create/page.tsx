@@ -15,7 +15,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { createProvider } from "@/lib/api/requests/provider.requests";
-import { weeklyCron } from "@/lib/utils";
+import { weekday2Cron } from "@/lib/utils";
 import { string } from "zod";
 
 // Days of the week for weekly dispatches (3-letter abbreviations)
@@ -137,7 +137,7 @@ export default function CreateProviderPage() {
         summary: formData.description,
         tags,
         locale: "En-US",
-        schedule: weeklyCron(selectedDay),
+        schedule: weekday2Cron(selectedDay),
       };
 
 

@@ -1,39 +1,47 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, Bars3Icon } from "@heroicons/react/24/outline";
+import { Menu, ChevronLeft, ChevronRight } from "lucide-react";
 
-interface HeaderProps {
+interface DashboardHeaderProps {
   setMobileMenuOpen: (open: boolean) => void;
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
 }
 
-export function DashboardHeader({ setMobileMenuOpen }: HeaderProps) {
+export function DashboardHeader({
+  setMobileMenuOpen,
+  sidebarCollapsed,
+  setSidebarCollapsed,
+}: DashboardHeaderProps) {
   return (
-    <div className="border-b sticky top-0 bg-background z-10">
-      <div className="flex h-16 items-center px-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden mr-2"
-          onClick={() => setMobileMenuOpen(true)}
-        >
-          <Bars3Icon className="h-5 w-5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          asChild
-          className="hidden md:flex"
-        >
-          <Link href="/dashboard">
-            <ArrowLeftIcon className="h-5 w-5" />
-          </Link>
-        </Button>
-        <div className="ml-auto">
-          <Link href="/upgrade">
-            <Button variant="outline">Upgrade to Pro</Button>
-          </Link>
-        </div>
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
+      <button
+        type="button"
+        className="hidden md:flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
+        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+      >
+        {sidebarCollapsed ? (
+          <ChevronRight className="h-6 w-6" />
+        ) : (
+          <ChevronLeft className="h-6 w-6" />
+        )}
+        <span className="sr-only">
+          {sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        </span>
+      </button>
+      <button
+        type="button"
+        className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground"
+        onClick={() => setMobileMenuOpen(true)}
+      >
+        <span className="sr-only">Open sidebar</span>
+        <Menu className="h-6 w-6" />
+      </button>
+      <div className="ml-auto">
+        <Link href="/upgrade">
+          <Button variant="outline">Upgrade to Pro</Button>
+        </Link>
       </div>
-    </div>
+    </header>
   );
 }

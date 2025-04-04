@@ -5,7 +5,6 @@ import { useState } from "react";
 import { logOut } from "@/lib/api/requests/auth.requests";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardHeader } from "@/components/dashboard/header";
-import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useRef } from "react";
 import { refreshToken } from "@/lib/api/requests/auth.requests";
 
@@ -16,6 +15,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const handleLogout = async () => {
     await logOut();
@@ -47,19 +47,24 @@ export default function DashboardLayout({
         clearInterval(refreshTimerRef.current);
       }
     };
-  }, [refreshToken]);
+  }, []);
 
   return (
     <div className="flex min-h-screen h-screen overflow-hidden">
       <DashboardSidebar
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        collapsed={sidebarCollapsed}
         onLogout={handleLogout}
       />
 
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <DashboardHeader setMobileMenuOpen={setMobileMenuOpen} />
+        <DashboardHeader 
+          setMobileMenuOpen={setMobileMenuOpen}
+          sidebarCollapsed={sidebarCollapsed}
+          setSidebarCollapsed={setSidebarCollapsed}
+        />
         <main className="flex-1 pb-8 overflow-y-auto">{children}</main>
       </div>
     </div>

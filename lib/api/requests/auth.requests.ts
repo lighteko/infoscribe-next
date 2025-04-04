@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/api/client";
+import { apiClient } from "@api/client";
 import { useAuthSettingsStore, useAuthStore } from "@/lib/store/auth-store";
 import {
   EmailVerificationRequest,
@@ -18,8 +18,8 @@ export function signUp(payload: SignUpRequest) {
 // Updated login to use Basic Authentication
 export async function logIn(payload: LogInRequest) {
   // Create base64 encoded credentials for Basic Authentication
-  const credentials = btoa(`${payload.email}:${payload.password}`);
-
+  const credentials = btoa(`${payload.email}:${payload.pwd}`);
+  
   return apiClient("/auth/login", {
     method: "POST",
     headers: {
@@ -29,20 +29,25 @@ export async function logIn(payload: LogInRequest) {
       isSessionOnly: payload.isSessionOnly,
     }),
   }).then((response) => {
-    // Store the access token in Zustand
-    useAuthStore
-      .getState()
-      .login(
+    // Check if we received a token
+    if (response.data?.accessToken) {
+      console.log("Login successful, received token");
+      
+      // Store the access token in Zustand
+      useAuthStore.getState().login(
         response.data.accessToken,
         response.data.user,
         !payload.isSessionOnly
       );
-    return response;
+      return response;
+    } else {
+      console.error("No token in login response");
+      throw new Error("Authentication failed: No token received");
+    }
   });
 }
 
 export async function logOut() {
-  console.log(useAuthStore.getState());
   return apiClient("/auth/logout", {
     method: "POST",
     headers: {

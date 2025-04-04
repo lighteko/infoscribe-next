@@ -1,42 +1,44 @@
-import { refreshToken } from "./requests/auth.requests";
+import { logOut, refreshToken } from "./requests/auth.requests";
 import { useAuthStore } from "@/lib/store/auth-store";
 
 let isRefreshing = false;
 let refreshPromise: Promise<any> | null = null;
 
 export async function executeWithTokenRefresh<T>(
-  apiCall: () => Promise<T>
+  apiCall: () => Promise<T>,
+  maxRetries = 1 // Add retry limit
 ): Promise<T> {
-  try {
-    return await apiCall();
-  } catch (error: any) {
-    // If error is due to token expiration
-    if (
-      error.message?.includes("expired") &&
-      useAuthStore.getState().accessToken
-    ) {
-      // Only refresh once, queue all requests
-      if (!isRefreshing) {
-        isRefreshing = true;
-        refreshPromise = refreshToken()
-          .catch(() => {
-            // If refresh fails, logout
-            useAuthStore.getState().logout();
-            throw error;
-          })
-          .finally(() => {
-            isRefreshing = false;
-            refreshPromise = null;
-          });
-      }
+  let retryCount = 0;
 
-      // Wait for the refresh to complete
-      if (refreshPromise) {
-        await refreshPromise;
-        // Retry the original request
-        return apiCall();
+  async function attemptCall(): Promise<T> {
+    try {
+      return await apiCall();
+    } catch (error: any) {
+      if (retryCount < maxRetries && !useAuthStore.getState().accessToken) {
+        retryCount++;
+        // Create refresh promise first, then set flag to avoid race condition
+        if (!isRefreshing) {
+          refreshPromise = refreshToken()
+            .catch((e) => {
+              // logOut();
+              console.log(e);
+            })
+            .finally(() => {
+              isRefreshing = false;
+              refreshPromise = null;
+            });
+          isRefreshing = true;
+        }
+
+        // Wait for existing refresh to complete
+        if (refreshPromise) {
+          await refreshPromise;
+          return attemptCall(); // Retry with recursion
+        }
       }
+      throw error;
     }
-    throw error;
   }
+
+  return attemptCall();
 }

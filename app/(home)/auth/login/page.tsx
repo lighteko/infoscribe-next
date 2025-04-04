@@ -43,7 +43,7 @@ export default function Login() {
 
       await logIn({
         email: values.email as string,
-        password: values.password as string,
+        pwd: values.password as string,
         isSessionOnly: values.remember ? false : true,
       });
 

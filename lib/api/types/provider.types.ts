@@ -1,29 +1,33 @@
-export interface GetProviderResponse {
+export interface MyProvider {
+  providerId: string;
+  title: string;
+  summary: string;
+  schedule: string;
+  locale: string;
+  tags: string[];
+  subscribers: number;
+}
+
+export interface Provider {
+  providerId: string;
   creator: string;
   title: string;
-  sendingDay: string;
+  summary: string;
+  schedule: string;
   locale: string;
-  categories: string[];
-  createdDate: Date;
+  tags: string[];
+  subscribers: number;
 }
 
 export interface CreateProviderRequest {
-  userId: string;
   title: string;
+  summary: string;
   locale: string;
-  categories: string[];
-  sendingDay: string;
-}
-
-export interface CreateProviderResponse {
-  // ...
+  tags: string[];
+  schedule: string;
 }
 
 export interface SubscribeProviderRequest {
   providerId: string;
   userId: string;
-}
-
-export interface SubscribeProviderResponse {
-  // ...
 }

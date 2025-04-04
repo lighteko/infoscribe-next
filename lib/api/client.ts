@@ -14,17 +14,22 @@ export async function apiClient(path: string, options?: RequestInit) {
     (headers as Record<string, string>)[
       "Authorization"
     ] = `Bearer ${accessToken}`;
+    console.log(
+      `Request to ${path} with auth token: ${accessToken.substring(0, 10)}...`
+    );
+  } else {
+    console.log(`Request to ${path} without auth token`);
   }
 
-  const res = await fetch(`https://api.infoscribe.me${path}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
     ...options,
     headers,
-    credentials: "include", // Keep this for refresh token cookie
+    credentials: "include", // Important for cookies/refresh tokens
   });
 
-  if (!res.ok) {
+  if (res.status >= 400) {
     const response = await res.json();
-    throw new Error(response.data.message.split("Error: ")[1]);
+    throw new Error(response.data.message);
   }
 
   return res.json();

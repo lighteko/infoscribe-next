@@ -1,17 +1,19 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { ProviderResponse } from "@/lib/api/types/provider.types";
+import { MyProvider } from "@/lib/api/types/provider.types";
 import { getAllMyProviders } from "@/lib/api/requests/provider.requests";
 import { cron2Weekday } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function ProvidersPage() {
-  const [providers, setProviders] = useState<ProviderResponse[]>([]);
+export default function MyProvidersPage() {
+  const [providers, setProviders] = useState<MyProvider[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProviders = async () => {
@@ -27,6 +29,10 @@ export default function ProvidersPage() {
 
     fetchProviders();
   }, []);
+
+  const handleProviderClick = (providerId: string) => {
+    router.push(`/dashboard/my-providers/${providerId}`);
+  };
 
   if (isLoading) {
     return (
@@ -47,7 +53,7 @@ export default function ProvidersPage() {
             Manage your newsletter providers here.
           </p>
         </div>
-        <Link href="/dashboard/providers/create">
+        <Link href="/dashboard/my-providers/create">
           <Button className="self-start sm:self-auto">Create Provider</Button>
         </Link>
       </div>
@@ -58,18 +64,28 @@ export default function ProvidersPage() {
             <p className="text-muted-foreground text-center">
               You haven't created any providers yet.
             </p>
-            <Button>Create your first provider</Button>
+            <Link href="/dashboard/my-providers/create">
+              <Button className="self-start sm:self-auto">
+                Create your first provider
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4">
           {providers.map((provider) => (
-            <Card key={provider.providerId} className="p-4 sm:p-6">
+            <Card 
+              key={provider.providerId} 
+              className="p-4 sm:p-6 hover:shadow-md transition-all cursor-pointer"
+              onClick={() => handleProviderClick(provider.providerId)}
+            >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="space-y-3">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-semibold">{provider.title}</h3>
+                      <h3 className="text-lg font-semibold">
+                        {provider.title}
+                      </h3>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       {provider.tags.map((tag) => (
@@ -98,9 +114,21 @@ export default function ProvidersPage() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <Button
+                    variant="default"
+                    size="sm"
+                    className="justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/dashboard/my-providers/${provider.providerId}`);
+                    }}
+                  >
+                    View Details
+                  </Button>
+                  <Button
                     variant="outline"
                     size="sm"
                     className="justify-center"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     View Analytics
                   </Button>
@@ -108,6 +136,7 @@ export default function ProvidersPage() {
                     variant="outline"
                     size="sm"
                     className="justify-center"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     Send Test Newsletter
                   </Button>

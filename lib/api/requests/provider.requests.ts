@@ -1,6 +1,6 @@
 import { CreateProviderRequest } from "@api/types/provider.types";
 import { apiClient } from "@api/client";
-import { executeWithTokenRefresh } from "../interceptor";
+import { executeWithTokenRefresh } from "@api/interceptor";
 
 export async function createProvider(payload: CreateProviderRequest) {
   return executeWithTokenRefresh(() =>
@@ -14,6 +14,14 @@ export async function createProvider(payload: CreateProviderRequest) {
 export async function getAllMyProviders() {
   return executeWithTokenRefresh(() =>
     apiClient("/provider/all", {
+      method: "GET",
+    })
+  );
+}
+
+export async function getProviderById(providerId: string) {
+  return executeWithTokenRefresh(() =>
+    apiClient(`/provider?providerId=${providerId}`, {
       method: "GET",
     })
   );

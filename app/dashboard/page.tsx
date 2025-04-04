@@ -36,7 +36,7 @@ export default function DashboardPage() {
             Welcome back! Here's an overview of your newsletters.
           </p>
         </div>
-        <Link href="/dashboard/providers/create">
+        <Link href="/dashboard/my-providers/create">
           <Button>Create Provider</Button>
         </Link>
       </div>

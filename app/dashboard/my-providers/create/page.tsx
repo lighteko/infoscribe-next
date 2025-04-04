@@ -16,9 +16,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { createProvider } from "@/lib/api/requests/provider.requests";
 import { weekday2Cron } from "@/lib/utils";
-import { string } from "zod";
 
-// Days of the week for weekly dispatches (3-letter abbreviations)
 const weekdays = [
   { value: "SUN", label: "Sunday" },
   { value: "MON", label: "Monday" },
@@ -140,9 +138,7 @@ export default function CreateProviderPage() {
         schedule: weekday2Cron(selectedDay),
       };
 
-
-
-      await createProvider(providerData)
+      await createProvider(providerData);
 
       toast({
         title: "Success",
@@ -150,7 +146,7 @@ export default function CreateProviderPage() {
       });
 
       // Redirect to providers list
-      router.push("/dashboard/providers");
+      router.push("/dashboard/my-providers");
     } catch (error) {
       console.error("Error creating provider:", error);
       toast({
@@ -355,7 +351,7 @@ export default function CreateProviderPage() {
                 <Button
                   variant="outline"
                   type="button"
-                  onClick={() => router.push("/dashboard/providers")}
+                  onClick={() => router.push("/dashboard/my-providers")}
                 >
                   Cancel
                 </Button>

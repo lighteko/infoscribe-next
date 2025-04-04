@@ -1,5 +1,16 @@
-export interface ProviderResponse {
+export interface MyProvider {
   providerId: string;
+  title: string;
+  summary: string;
+  schedule: string;
+  locale: string;
+  tags: string[];
+  subscribers: number;
+}
+
+export interface Provider {
+  providerId: string;
+  creator: string;
   title: string;
   summary: string;
   schedule: string;

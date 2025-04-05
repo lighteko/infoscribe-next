@@ -25,3 +25,17 @@ export interface PasswordResetRequest {
 export interface EmailVerificationRequest {
   token: string;
 }
+
+export interface UpdateUserRequest {
+  username: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface GetUserResponse {
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  plan: string;
+}

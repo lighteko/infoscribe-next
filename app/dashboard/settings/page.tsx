@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,14 +8,112 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
+import { deleteAccount, getUserInfo, updateAccount } from "@api/requests/auth.requests";
+import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import { GetUserResponse, UpdateUserRequest } from "@api/types/auth.types";
 
 export default function SettingsPage() {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
+
+  // Profile form state
+  const [profileData, setProfileData] = useState<GetUserResponse>({
+    username: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    plan: "",
+  });
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await getUserInfo();
+        const userData: GetUserResponse = response.data;
+        setProfileData(userData);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch user information.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchUserInfo();
+  }, [toast]);
+
+  // Handle profile form submission
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const updateData: UpdateUserRequest = {
+        username: profileData.username,
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+      };
+
+      await updateAccount(updateData);
+
+      toast({
+        title: "Profile updated",
+        description: "Your profile information has been saved successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile information.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    setIsDialogOpen(false);
+    setIsLoading(true);
+    try {
+      await deleteAccount();
+      toast({
+        title: "Account deleted",
+        description: "Your account has been permanently deleted.",
+      });
+      router.replace("/");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="space-y-0.5">
@@ -28,52 +127,80 @@ export default function SettingsPage() {
 
       <div className="grid gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Update your personal information and email preferences.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" defaultValue="John Doe" />
+          <form onSubmit={handleProfileSubmit}>
+            <CardHeader>
+              <CardTitle>Profile Information</CardTitle>
+              <CardDescription>
+                Update your personal information and email preferences.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    value={profileData.username}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, username: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    value={profileData.firstName}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, firstName: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={profileData.lastName}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, lastName: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    value={profileData.email}
+                    disabled
+                    type="email"
+                  />
+                  <p className="text-sm text-muted-foreground">Email cannot be changed</p>
+                </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  defaultValue="john@example.com"
-                  type="email"
-                />
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label>Email Notifications</Label>
-                <p className="text-sm text-muted-foreground">
-                  Receive notifications about new newsletters and updates.
-                </p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-          </CardContent>
+            </CardContent>
+            <CardFooter>
+              <Button type="submit" disabled={isLoading}>
+                Save Changes
+              </Button>
+            </CardFooter>
+          </form>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle>Subscription Plan</CardTitle>
             <CardDescription>
-              You are currently on the Free plan.
+              You are currently on the {profileData.plan || "Free"} plan.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <p className="font-medium">Free Plan</p>
+                <p className="font-medium">{profileData.plan || "Free"} Plan</p>
                 <p className="text-sm text-muted-foreground">
-                  Limited to 1 provider
+                  {profileData.plan === "Premium" 
+                    ? "Unlimited providers and features" 
+                    : "Limited to 1 provider"}
                 </p>
               </div>
               <Link href="/subscription-plans">
@@ -91,7 +218,31 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="destructive">Delete Account</Button>
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={isLoading}>
+                  Delete Account
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete your account? This action
+                    cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteAccount}
+                    disabled={isLoading}
+                  >
+                    Confirm
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
       </div>

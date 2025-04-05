@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { getProviderById } from "@/lib/api/requests/provider.requests";
+import {
+  deleteProviderById,
+  getProviderById,
+} from "@/lib/api/requests/provider.requests";
 import { Provider } from "@/lib/api/types/provider.types";
 import { cron2Weekday } from "@/lib/utils";
 import {
@@ -48,12 +51,8 @@ export default function MyProviderDetailPage() {
     }
   }, [providerId]);
 
-  const handleDelete = () => {
-    // Implement delete functionality here
-    toast({
-      title: "Not implemented",
-      description: "Delete functionality not yet implemented",
-    });
+  const handleDelete = async () => {
+    await deleteProviderById(providerId);
   };
 
   if (isLoading) {

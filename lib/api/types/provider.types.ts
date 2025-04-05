@@ -19,6 +19,14 @@ export interface Provider {
   subscribers: number;
 }
 
+export interface Subscribable {
+  providerId: string;
+  title: string;
+  summary: string;
+  schedule: string;
+  tags: string[];
+}
+
 export interface CreateProviderRequest {
   title: string;
   summary: string;

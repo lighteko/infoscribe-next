@@ -26,3 +26,19 @@ export async function getProviderById(providerId: string) {
     })
   );
 }
+
+export async function deleteProviderById(providerId: string) {
+  return executeWithTokenRefresh(() =>
+    apiClient(`/provider?providerId=${providerId}`, {
+      method: "DELETE",
+    })
+  );
+}
+
+export async function getSubscribableProviders() {
+  return executeWithTokenRefresh(() =>
+    apiClient(`/provider/subscribable`, {
+      method: "GET",
+    })
+  );
+}

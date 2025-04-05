@@ -83,18 +83,12 @@ export default function SubscriptionsPage() {
   const handleUnsubscribe = async (providerId: string) => {
     try {
       await unsubscribeFromNewsletter(providerId);
-
-      // Get the unsubscribed newsletter to add to available subscriptions
       const unsubscribedNewsletter = subscriptions.find(
         (sub) => sub.providerId === providerId
       );
-
-      // Update subscriptions list
       setSubscriptions((prevState) =>
         prevState.filter((sub) => sub.providerId !== providerId)
       );
-
-      // Add to available subscriptions if found
       if (unsubscribedNewsletter) {
         setSubscribables((prevState) => [
           ...prevState,

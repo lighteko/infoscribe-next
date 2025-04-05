@@ -8,8 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarIcon } from "@heroicons/react/24/outline";
 import {
   getAllMySubscriptions,
-  subscribe as subscribeToNewsletter,
-  unsubscribe as unsubscribeFromNewsletter,
+  subscribe,
+  unsubscribe,
 } from "@api/requests/subscription.request";
 import { getSubscribableProviders } from "@api/requests/provider.requests";
 import { Subscribable } from "@api/types/provider.types";
@@ -55,7 +55,7 @@ export default function SubscriptionsPage() {
   // Subscribe to a newsletter
   const handleSubscribe = async (providerId: string) => {
     try {
-      await subscribeToNewsletter(providerId);
+      await subscribe(providerId);
       // Fetch updated subscriptions instead of manually updating state
       const updatedSubscriptions = await getAllMySubscriptions();
       setSubscriptions(updatedSubscriptions);
@@ -82,7 +82,7 @@ export default function SubscriptionsPage() {
   // Unsubscribe from a newsletter
   const handleUnsubscribe = async (providerId: string) => {
     try {
-      await unsubscribeFromNewsletter(providerId);
+      await unsubscribe(providerId);
       const unsubscribedNewsletter = subscriptions.find(
         (sub) => sub.providerId === providerId
       );

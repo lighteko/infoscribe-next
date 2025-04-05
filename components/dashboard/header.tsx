@@ -38,8 +38,8 @@ export function DashboardHeader({
         <Menu className="h-6 w-6" />
       </button>
       <div className="ml-auto">
-        <Link href="/upgrade">
-          <Button variant="outline">Upgrade to Pro</Button>
+        <Link href="/subscription-plans">
+          <Button variant="outline">Upgrade Your Plan</Button>
         </Link>
       </div>
     </header>

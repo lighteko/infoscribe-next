@@ -1,12 +1,18 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import Link from "next/link";
 
 export default function SettingsPage() {
   return (
@@ -36,7 +42,11 @@ export default function SettingsPage() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" defaultValue="john@example.com" type="email" />
+                <Input
+                  id="email"
+                  defaultValue="john@example.com"
+                  type="email"
+                />
               </div>
             </div>
             <div className="flex items-center justify-between">
@@ -47,44 +57,6 @@ export default function SettingsPage() {
                 </p>
               </div>
               <Switch defaultChecked />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Reading Preferences</CardTitle>
-            <CardDescription>
-              Customize your newsletter reading experience.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label>Reading Style</Label>
-                <Select defaultValue="detailed">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select reading style" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="brief">Brief (Summary only)</SelectItem>
-                    <SelectItem value="detailed">Detailed (Full content)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label>Language</Label>
-                <Select defaultValue="en">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -104,7 +76,9 @@ export default function SettingsPage() {
                   Limited to 1 provider
                 </p>
               </div>
-              <Button>Upgrade to Pro</Button>
+              <Link href="/subscription-plans">
+                <Button>Upgrade Your Plan</Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
@@ -123,4 +97,4 @@ export default function SettingsPage() {
       </div>
     </div>
   );
-} 
+}

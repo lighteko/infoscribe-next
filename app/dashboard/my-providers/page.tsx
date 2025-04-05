@@ -74,8 +74,8 @@ export default function MyProvidersPage() {
       ) : (
         <div className="grid gap-4">
           {providers.map((provider) => (
-            <Card 
-              key={provider.providerId} 
+            <Card
+              key={provider.providerId}
               className="p-4 sm:p-6 hover:shadow-md transition-all cursor-pointer"
               onClick={() => handleProviderClick(provider.providerId)}
             >
@@ -119,7 +119,9 @@ export default function MyProvidersPage() {
                     className="justify-center"
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push(`/dashboard/my-providers/${provider.providerId}`);
+                      router.push(
+                        `/dashboard/my-providers/${provider.providerId}`
+                      );
                     }}
                   >
                     View Details
@@ -155,7 +157,9 @@ export default function MyProvidersPage() {
               You've reached the limit of 1 provider on the free plan. Upgrade
               to Pro to create unlimited providers.
             </p>
-            <Button variant="default">Upgrade to Pro</Button>
+            <Link href="/subscription-plans">
+              <Button variant="default">Upgrade Your Plan</Button>
+            </Link>
           </div>
         </Card>
       )}

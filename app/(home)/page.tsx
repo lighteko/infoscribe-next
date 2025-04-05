@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore } from "@/lib/store/auth-store";
-import { refreshToken } from "@/lib/api/requests/auth.requests";
 import {
   Clock,
   Filter,
@@ -19,27 +17,7 @@ import {
 import Link from "next/link";
 
 export default function Home() {
-  const { isAuthenticated, accessToken } = useAuthStore();
-  const [_, setAuthChecked] = useState(false);
-
-  // Check if we need to refresh the token
-  useEffect(() => {
-    const checkAndRefreshToken = async () => {
-      if (!accessToken) {
-        try {
-          await refreshToken();
-        } catch (error) {
-          console.error("Failed to refresh token:", error);
-        } finally {
-          setAuthChecked(true);
-        }
-      } else {
-        setAuthChecked(true);
-      }
-    };
-
-    checkAndRefreshToken();
-  }, [accessToken]);
+  const { isAuthenticated } = useAuthStore();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary">

@@ -175,11 +175,11 @@ export default function MyProviderDetailPage() {
           </div>
 
           <div className="pt-4 border-t flex flex-col sm:flex-row gap-3">
-            <Button className="flex items-center gap-1">
+            <Button className="flex items-center gap-1" disabled title="Coming soon">
               <ChartBarIcon className="h-4 w-4" />
               View Analytics
             </Button>
-            <Button variant="outline" className="flex items-center gap-1">
+            <Button variant="outline" className="flex items-center gap-1" disabled title="Coming soon">
               <EnvelopeIcon className="h-4 w-4" />
               Send Test Newsletter
             </Button>

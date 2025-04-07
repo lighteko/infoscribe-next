@@ -6,7 +6,9 @@ import {
   PasswordResetRequest,
   PasswordResetValidation,
   SignUpRequest,
+  UpdateUserRequest,
 } from "@api/types/auth.types";
+import { executeWithTokenRefresh } from "@api/interceptor";
 
 export function signUp(payload: SignUpRequest) {
   return apiClient("/auth/signup", {
@@ -19,7 +21,7 @@ export function signUp(payload: SignUpRequest) {
 export async function logIn(payload: LogInRequest) {
   // Create base64 encoded credentials for Basic Authentication
   const credentials = btoa(`${payload.email}:${payload.pwd}`);
-  
+
   return apiClient("/auth/login", {
     method: "POST",
     headers: {
@@ -32,13 +34,15 @@ export async function logIn(payload: LogInRequest) {
     // Check if we received a token
     if (response.data?.accessToken) {
       console.log("Login successful, received token");
-      
+
       // Store the access token in Zustand
-      useAuthStore.getState().login(
-        response.data.accessToken,
-        response.data.user,
-        !payload.isSessionOnly
-      );
+      useAuthStore
+        .getState()
+        .login(
+          response.data.accessToken,
+          response.data.user,
+          !payload.isSessionOnly
+        );
       return response;
     } else {
       console.error("No token in login response");
@@ -101,4 +105,29 @@ export async function verifyEmail(payload: EmailVerificationRequest) {
     }
     return response;
   });
+}
+
+export async function deleteAccount() {
+  return executeWithTokenRefresh(() =>
+    apiClient("/auth/me", {
+      method: "DELETE",
+    })
+  );
+}
+
+export async function updateAccount(payload: UpdateUserRequest) {
+  return executeWithTokenRefresh(() =>
+    apiClient("/auth/me", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    })
+  );
+}
+
+export async function getUserInfo() {
+  return executeWithTokenRefresh(() =>
+    apiClient("/auth/me", {
+      method: "GET",
+    })
+  );
 }

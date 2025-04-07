@@ -74,20 +74,20 @@ const plans = [
   },
 ];
 
-export default function SubscriptionPlansPage() {
+export default function PricingPlansPage() {
   return (
-    <div className="container px-4 py-8 md:py-12 max-w-6xl mx-auto h-full overflow-y-auto">
-      <div className="text-center mb-8 md:mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+    <div className="container px-4 py-6 md:py-12 max-w-6xl mx-auto">
+      <div className="text-center mb-6 md:mb-12">
+        <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-2 md:mb-3">
           Choose Your Plan
         </h1>
-        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto">
           Select the perfect subscription that suits your needs. Upgrade or
           downgrade at any time.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3 max-w-5xl mx-auto">
         {plans.map((plan) => (
           <Card
             key={plan.id}
@@ -115,10 +115,10 @@ export default function SubscriptionPlansPage() {
                   {plan.duration}
                 </span>
               </div>
-              <ul className="space-y-1 text-sm md:text-base">
+              <ul className="space-y-2 text-sm md:text-base">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center">
-                    <Check className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                  <li key={i} className="flex items-start">
+                    <Check className="h-4 w-4 text-primary mr-2 mt-1 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -153,4 +153,4 @@ export default function SubscriptionPlansPage() {
       </div>
     </div>
   );
-}
+} 

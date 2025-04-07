@@ -3,12 +3,55 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { MyProvider } from "@/lib/api/types/provider.types";
 import { getAllMyProviders } from "@/lib/api/requests/provider.requests";
 import { cron2Weekday } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+function ProvidersSkeleton() {
+  return (
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+        <div>
+          <Skeleton className="h-8 w-40 mb-2" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-32" />
+      </div>
+
+      <div className="grid gap-4">
+        {Array(3).fill(0).map((_, i) => (
+          <Card key={i} className="p-4 sm:p-6">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+              <div className="space-y-3">
+                <div>
+                  <Skeleton className="h-6 w-48 mb-2" />
+                  <div className="flex flex-wrap items-center gap-2 mt-1">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-5 w-24 rounded-full" />
+                  </div>
+                </div>
+                <Skeleton className="h-4 w-full max-w-md" />
+                <div className="flex items-center space-x-4">
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-28" />
+                <Skeleton className="h-8 w-36" />
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function MyProvidersPage() {
   const [providers, setProviders] = useState<MyProvider[]>([]);
@@ -35,13 +78,7 @@ export default function MyProvidersPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-        <div className="flex justify-center items-center h-[400px]">
-          <p>Loading providers...</p>
-        </div>
-      </div>
-    );
+    return <ProvidersSkeleton />;
   }
 
   return (
@@ -74,8 +111,8 @@ export default function MyProvidersPage() {
       ) : (
         <div className="grid gap-4">
           {providers.map((provider) => (
-            <Card 
-              key={provider.providerId} 
+            <Card
+              key={provider.providerId}
               className="p-4 sm:p-6 hover:shadow-md transition-all cursor-pointer"
               onClick={() => handleProviderClick(provider.providerId)}
             >
@@ -119,7 +156,9 @@ export default function MyProvidersPage() {
                     className="justify-center"
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push(`/dashboard/my-providers/${provider.providerId}`);
+                      router.push(
+                        `/dashboard/my-providers/${provider.providerId}`
+                      );
                     }}
                   >
                     View Details
@@ -129,6 +168,8 @@ export default function MyProvidersPage() {
                     size="sm"
                     className="justify-center"
                     onClick={(e) => e.stopPropagation()}
+                    disabled
+                    title="Coming soon"
                   >
                     View Analytics
                   </Button>
@@ -137,6 +178,8 @@ export default function MyProvidersPage() {
                     size="sm"
                     className="justify-center"
                     onClick={(e) => e.stopPropagation()}
+                    disabled
+                    title="Coming soon"
                   >
                     Send Test Newsletter
                   </Button>
@@ -155,7 +198,9 @@ export default function MyProvidersPage() {
               You've reached the limit of 1 provider on the free plan. Upgrade
               to Pro to create unlimited providers.
             </p>
-            <Button variant="default">Upgrade to Pro</Button>
+            <Link href="/pricing-plans">
+              <Button variant="default">Upgrade Your Plan</Button>
+            </Link>
           </div>
         </Card>
       )}

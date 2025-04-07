@@ -41,19 +41,7 @@ export function useAuth({
     };
 
     checkAuth();
-
-    // Set up automatic token refresh (every 5 minutes)
-    const refreshInterval = setInterval(async () => {
-      if (isAuthenticated) {
-        try {
-          await refreshToken();
-        } catch (error) {
-          console.error('Failed to refresh token:', error);
-        }
-      }
-    }, 5 * 60 * 1000);
-
-    return () => clearInterval(refreshInterval);
+    // We've removed the interval-based token refresh since it's now handled by AuthProvider
   }, [isAuthenticated, requireAuth, redirectTo, router, onAuthSuccess, onAuthFailure]);
 
   return { user, accessToken, isAuthenticated };

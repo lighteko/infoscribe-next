@@ -13,14 +13,13 @@ interface NewsletterListProps {
 }
 
 export function NewsletterList({ initialNewsletters }: NewsletterListProps) {
-  const [newsletters, setNewsletters] = useState<Newsletter[]>(initialNewsletters);
-  
+  const [newsletters, setNewsletters] =
+    useState<Newsletter[]>(initialNewsletters);
+
   const handleMarkAsRead = (id: string) => {
     setNewsletters(
       newsletters.map((newsletter) =>
-        newsletter.id === id
-          ? { ...newsletter, isRead: true }
-          : newsletter
+        newsletter.id === id ? { ...newsletter, isRead: true } : newsletter
       )
     );
   };
@@ -46,11 +45,7 @@ export function NewsletterList({ initialNewsletters }: NewsletterListProps) {
 
         <TabsContent value="inbox" className="space-y-4">
           {newsletters.map((newsletter) => (
-            <NewsletterItem
-              key={newsletter.id}
-              newsletter={newsletter}
-              onMarkAsRead={handleMarkAsRead}
-            />
+            <NewsletterItem key={newsletter.id} newsletter={newsletter} />
           ))}
         </TabsContent>
 

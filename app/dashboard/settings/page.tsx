@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { deleteAccount, getUserInfo, updateAccount } from "@api/requests/auth.requests";
@@ -30,9 +31,58 @@ import {
 } from "@/components/ui/alert-dialog";
 import { GetUserResponse, UpdateUserRequest } from "@api/types/auth.types";
 
+export function SettingsSkeleton() {
+  return (
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+      <div className="space-y-0.5">
+        <Skeleton className="h-8 w-32 mb-2" />
+        <Skeleton className="h-4 w-64" />
+      </div>
+
+      <Skeleton className="h-px my-6" />
+
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-40 mb-2" />
+            <Skeleton className="h-4 w-full max-w-md" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="grid gap-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Skeleton className="h-10 w-32" />
+          </CardFooter>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-40 mb-2" />
+            <Skeleton className="h-4 w-full max-w-sm" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-20 w-full" />
+          </CardContent>
+          <CardFooter>
+            <Skeleton className="h-10 w-40" />
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
 
@@ -47,6 +97,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
+      setIsDataLoading(true);
       try {
         const response = await getUserInfo();
         const userData: GetUserResponse = response.data;
@@ -57,6 +108,8 @@ export default function SettingsPage() {
           description: "Failed to fetch user information.",
           variant: "destructive",
         });
+      } finally {
+        setIsDataLoading(false);
       }
     };
 
@@ -114,6 +167,10 @@ export default function SettingsPage() {
     }
   };
 
+  if (isDataLoading) {
+    return <SettingsSkeleton />;
+  }
+  
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="space-y-0.5">
@@ -203,7 +260,7 @@ export default function SettingsPage() {
                     : "Limited to 1 provider"}
                 </p>
               </div>
-              <Link href="/subscription-plans">
+              <Link href="/pricing-plans">
                 <Button>Upgrade Your Plan</Button>
               </Link>
             </div>

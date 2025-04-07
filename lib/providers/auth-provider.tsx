@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useAuthStore } from "@/lib/store/auth-store";
-import { refreshToken } from "@/lib/api/requests/auth.requests";
+import { logOut, refreshToken } from "@/lib/api/requests/auth.requests";
+import { useRouter } from "next/navigation";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { accessToken } = useAuthStore();
   const [authChecked, setAuthChecked] = useState(false);
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
-
+  const router = useRouter();
   // Check if we need to refresh the token
   useEffect(() => {
     const checkAndRefreshToken = async () => {
@@ -16,8 +17,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!accessToken) {
           await refreshToken();
         }
-      } catch (error) {
-        console.error("Failed to refresh token:", error);
+      } catch (error: any) {
+        if (
+          error.message.includes("Refresh token is required") ||
+          error.message.includes("Authentication is required")
+        ) {
+          router.replace("/");
+        }
       } finally {
         setAuthChecked(true);
       }
@@ -38,4 +44,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [accessToken]);
 
   return children;
-} 
+}

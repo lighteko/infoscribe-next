@@ -7,15 +7,13 @@ export interface Newsletter {
   content: string;
   timestamp: string;
   categories: string[];
-  isRead: boolean;
 }
 
 interface NewsletterItemProps {
   newsletter: Newsletter;
-  onMarkAsRead: (id: string) => void;
 }
 
-export function NewsletterItem({ newsletter, onMarkAsRead }: NewsletterItemProps) {
+export function NewsletterItem({ newsletter }: NewsletterItemProps) {
   return (
     <Card className="p-6">
       <div className="flex items-start justify-between">
@@ -29,13 +27,6 @@ export function NewsletterItem({ newsletter, onMarkAsRead }: NewsletterItemProps
           <span className="text-sm text-muted-foreground">
             {newsletter.timestamp}
           </span>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onMarkAsRead(newsletter.id)}
-          >
-            Mark as read
-          </Button>
           <Button variant="link" size="sm">
             Read full newsletter
           </Button>

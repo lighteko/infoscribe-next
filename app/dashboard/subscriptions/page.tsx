@@ -16,6 +16,7 @@ import { Subscribable } from "@api/types/provider.types";
 import { Subscription } from "@api/types/subscription.types";
 import { toast } from "@/hooks/use-toast";
 import { cron2Weekday } from "@/lib/utils";
+import Link from "next/link";
 
 export default function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -170,9 +171,13 @@ export default function SubscriptionsPage() {
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
-                      <Button variant="outline" size="sm" className="h-8">
-                        View Archive
-                      </Button>
+                      <Link
+                        href={`/dashboard/subscriptions/${subscription.providerId}`}
+                      >
+                        <Button variant="outline" size="sm" className="h-8">
+                          View Archive
+                        </Button>
+                      </Link>
                       <Button
                         variant="ghost"
                         size="sm"

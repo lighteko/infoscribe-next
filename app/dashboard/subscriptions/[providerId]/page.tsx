@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { getLetters } from "@/lib/api/requests/letter.requests";
 import { Letter } from "@/lib/api/types/letter.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeftIcon,
@@ -16,44 +15,6 @@ import Link from "next/link";
 import { formatDistance } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { getProviderById } from "@/lib/api/requests/provider.requests";
-
-// Define proper response interface based on API pattern
-export interface GetLettersResponse {
-  letters: Letter[];
-}
-
-export function NewsletterSkeleton() {
-  return (
-    <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div>
-          <Skeleton className="h-8 w-48 mb-2" />
-          <Skeleton className="h-4 w-72" />
-        </div>
-        <Skeleton className="h-10 w-28" />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array(6)
-          .fill(0)
-          .map((_, i) => (
-            <Card key={i} className="h-[160px]">
-              <CardHeader className="pb-2">
-                <Skeleton className="h-5 w-full" />
-                <Skeleton className="h-5 w-4/5 mt-1" />
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2 mt-2">
-                  <Skeleton className="h-4 w-4 rounded-full" />
-                  <Skeleton className="h-4 w-24" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-      </div>
-    </div>
-  );
-}
 
 export default function NewsletterListView() {
   const params = useParams();
@@ -98,10 +59,6 @@ export default function NewsletterListView() {
       fetchLetters();
     }
   }, [providerId]);
-
-  if (isLoading) {
-    return <NewsletterSkeleton />;
-  }
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">

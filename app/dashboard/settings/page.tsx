@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { GetUserResponse, UpdateUserRequest } from "@api/types/auth.types";
 
-export function SettingsSkeleton() {
+function SettingsSkeleton() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="space-y-0.5">

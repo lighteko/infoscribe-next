@@ -21,7 +21,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useRouter } from "next/navigation";
 
-export function InboxSkeleton() {
+function InboxSkeleton() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       <div className="flex items-center justify-between">

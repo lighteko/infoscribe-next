@@ -25,6 +25,7 @@ import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useRouter } from "next/navigation";
+import { sendGAEvent } from "@/lib/analytics";
 
 function InboxSkeleton() {
   return (
@@ -128,6 +129,15 @@ export default function DashboardPage() {
     fetchInbox();
   }, [user, isAuthenticated, router]);
 
+  const handleViewNewsletterClick = (providerId: string, letterId: string, providerTitle: string) => {
+    sendGAEvent('view_newsletter', {
+      provider_id: providerId,
+      letter_id: letterId,
+      provider_title: providerTitle,
+    });
+    // Note: Navigation will still happen via the Link component
+  };
+
   if (isLoading) {
     return <InboxSkeleton />;
   }
@@ -204,6 +214,7 @@ export default function DashboardPage() {
                   <Link
                     href={`/dashboard/subscriptions/${letter.providerId}/letters/${letter.letterId}`}
                     key={letter.letterId}
+                    onClick={() => handleViewNewsletterClick(letter.providerId, letter.letterId, providerName)}
                   >
                     <Card className="group h-full relative overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer border border-border/40 hover:border-primary/30">
                       {/* Background gradient overlay with lower z-index */}

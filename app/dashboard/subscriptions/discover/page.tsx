@@ -11,6 +11,7 @@ import { Subscribable } from "@api/types/provider.types";
 import { toast } from "@/hooks/use-toast";
 import { cron2Weekday } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { sendGAEvent } from "@/lib/analytics";
 
 export default function DiscoverPage() {
   const [subscribables, setSubscribables] = useState<Subscribable[]>([]);
@@ -45,9 +46,12 @@ export default function DiscoverPage() {
     fetchSubscribables();
   }, []);
 
-  const handleSubscribe = async (providerId: string) => {
+  const handleSubscribe = async (providerId: string, providerTitle: string) => {
     try {
       await subscribe(providerId);
+
+      sendGAEvent('subscribe', { provider_id: providerId, provider_title: providerTitle });
+
       setSubscribables((prevState) =>
         prevState.filter((sub) => sub.providerId !== providerId)
       );
@@ -57,7 +61,6 @@ export default function DiscoverPage() {
         description: "You have successfully subscribed to the newsletter.",
       });
 
-      // Redirect to subscriptions page after successful subscription
       router.push("/dashboard/subscriptions");
     } catch (error) {
       console.error("Failed to subscribe:", error);
@@ -118,7 +121,7 @@ export default function DiscoverPage() {
                   <Button
                     size="sm"
                     className="h-8"
-                    onClick={() => handleSubscribe(subscription.providerId)}
+                    onClick={() => handleSubscribe(subscription.providerId, subscription.title)}
                   >
                     Subscribe
                   </Button>

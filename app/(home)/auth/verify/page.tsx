@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { verifyEmail } from "@/lib/api/requests/auth.requests";
 import { Brain, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { sendGAEvent } from "@/lib/analytics";
 
 export default function VerifyEmail() {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +28,10 @@ export default function VerifyEmail() {
     const verifyEmailToken = async () => {
       try {
         await verifyEmail({ token: verificationToken });
+
+        // Send verify_email event
+        sendGAEvent('verify_email');
+
         setSuccess(true);
 
         // Redirect to login after successful verification

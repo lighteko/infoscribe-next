@@ -19,6 +19,7 @@ import {
   PencilIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
+import { sendGAEvent } from "@/lib/analytics";
 
 export default function MyProviderDetailPage() {
   const params = useParams();
@@ -52,7 +53,38 @@ export default function MyProviderDetailPage() {
   }, [providerId]);
 
   const handleDelete = async () => {
-    await deleteProviderById(providerId);
+    if (!provider) return;
+
+    const providerId = provider.providerId;
+    const providerTitle = provider.title;
+
+    try {
+      await deleteProviderById(providerId);
+      
+      // Send delete_provider event
+      sendGAEvent('delete_provider', { provider_id: providerId, provider_title: providerTitle });
+
+      toast({
+        title: "Success",
+        description: "Provider deleted successfully.",
+      });
+
+      router.push("/dashboard/my-providers");
+    } catch (error) {
+      console.error("Error deleting provider:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete provider. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditClick = () => {
+    if (!provider) return;
+    sendGAEvent('edit_provider_click', { provider_id: provider.providerId, provider_title: provider.title });
+    // Navigation happens in onClick
+    router.push(`/dashboard/my-providers/${providerId}/edit`);
   };
 
   if (isLoading) {
@@ -101,9 +133,7 @@ export default function MyProviderDetailPage() {
             variant="outline"
             size="sm"
             className="flex items-center gap-1"
-            onClick={() =>
-              router.push(`/dashboard/my-providers/${providerId}/edit`)
-            }
+            onClick={handleEditClick}
           >
             <PencilIcon className="h-4 w-4" />
             <span>Edit</span>

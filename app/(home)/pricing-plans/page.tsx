@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Check } from "lucide-react";
+import { sendGAEvent } from "@/lib/analytics";
 
 const plans = [
   {
@@ -75,6 +76,18 @@ const plans = [
 ];
 
 export default function PricingPlansPage() {
+  const handlePlanCTAClick = (planName: string, planId: string) => {
+    sendGAEvent('select_plan', { 
+      plan_name: planName,
+      plan_id: planId,
+      source: 'pricing_page'
+    });
+  };
+
+  const handleContactClick = () => {
+    sendGAEvent('contact_us_click', { source: 'pricing_page' });
+  };
+
   return (
     <div className="container px-4 py-6 md:py-12 max-w-6xl mx-auto">
       <div className="text-center mb-6 md:mb-12">
@@ -129,6 +142,7 @@ export default function PricingPlansPage() {
                 asChild
                 className="w-full"
                 variant={plan.name === "Basic" ? "default" : "outline"}
+                onClick={() => handlePlanCTAClick(plan.name, plan.id)}
               >
                 <Link href={`${plan.ctaLink}&planId=${plan.id}`}>
                   {plan.cta}
@@ -147,7 +161,7 @@ export default function PricingPlansPage() {
           Contact our sales team for a personalized consultation or try the free
           plan to get started.
         </p>
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" onClick={handleContactClick}>
           <Link href="/contact">Contact Us</Link>
         </Button>
       </div>

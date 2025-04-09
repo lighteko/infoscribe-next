@@ -16,6 +16,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { createProvider } from "@/lib/api/requests/provider.requests";
 import { weekday2Cron } from "@/lib/utils";
+import { sendGAEvent } from "@/lib/analytics";
 
 const weekdays = [
   { value: "SUN", label: "Sunday" },
@@ -146,6 +147,13 @@ export default function CreateProviderPage() {
       };
 
       await createProvider(providerData);
+
+      // Send create_provider event
+      sendGAEvent('create_provider', { 
+        provider_title: providerData.title,
+        tags: providerData.tags.join(','), // Send tags as comma-separated string
+        schedule: providerData.schedule
+      });
 
       toast({
         title: "Success",

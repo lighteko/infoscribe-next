@@ -13,6 +13,7 @@ import { Subscription } from "@api/types/subscription.types";
 import { toast } from "@/hooks/use-toast";
 import { cron2Weekday } from "@/lib/utils";
 import Link from "next/link";
+import { sendGAEvent } from "@/lib/analytics";
 
 export default function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -39,9 +40,12 @@ export default function SubscriptionsPage() {
     fetchSubscriptions();
   }, []);
 
-  const handleUnsubscribe = async (providerId: string) => {
+  const handleUnsubscribe = async (providerId: string, providerTitle: string) => {
     try {
       await unsubscribe(providerId);
+
+      sendGAEvent('unsubscribe', { provider_id: providerId, provider_title: providerTitle });
+
       setSubscriptions((prevState) =>
         prevState.filter((sub) => sub.providerId !== providerId)
       );
@@ -61,6 +65,14 @@ export default function SubscriptionsPage() {
     }
   };
 
+  const handleDiscoverClick = () => {
+    sendGAEvent('discover_newsletters_click');
+  };
+
+  const handleViewArchiveClick = (providerId: string, providerTitle: string) => {
+    sendGAEvent('view_subscription_archive', { provider_id: providerId, provider_title: providerTitle });
+  };
+
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
@@ -70,7 +82,7 @@ export default function SubscriptionsPage() {
             Manage your newsletter subscriptions here.
           </p>
         </div>
-        <Link href="/dashboard/subscriptions/discover">
+        <Link href="/dashboard/subscriptions/discover" onClick={handleDiscoverClick}>
           <Button variant="outline">Discover Newsletters</Button>
         </Link>
       </div>
@@ -112,6 +124,7 @@ export default function SubscriptionsPage() {
                 <div className="flex flex-wrap items-center gap-3">
                   <Link
                     href={`/dashboard/subscriptions/${subscription.providerId}`}
+                    onClick={() => handleViewArchiveClick(subscription.providerId, subscription.title)}
                   >
                     <Button variant="outline" size="sm" className="h-8">
                       View Archive
@@ -121,7 +134,7 @@ export default function SubscriptionsPage() {
                     variant="ghost"
                     size="sm"
                     className="h-8 text-red-500 hover:text-red-600 hover:bg-red-50"
-                    onClick={() => handleUnsubscribe(subscription.providerId)}
+                    onClick={() => handleUnsubscribe(subscription.providerId, subscription.title)}
                   >
                     Unsubscribe
                   </Button>

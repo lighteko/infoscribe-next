@@ -15,6 +15,7 @@ import Link from "next/link";
 import { formatDistance } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { getProviderById } from "@/lib/api/requests/provider.requests";
+import { sendGAEvent } from "@/lib/analytics";
 
 export default function NewsletterListView() {
   const params = useParams();
@@ -59,6 +60,16 @@ export default function NewsletterListView() {
       fetchLetters();
     }
   }, [providerId]);
+
+  const handleViewArchivedLetterClick = (letterId: string, letterTitle: string) => {
+    sendGAEvent('view_archived_newsletter', { 
+      provider_id: providerId, 
+      provider_name: providerName,
+      letter_id: letterId,
+      letter_title: letterTitle
+    });
+    // Navigation happens via Link
+  };
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
@@ -111,6 +122,7 @@ export default function NewsletterListView() {
             <Link
               href={`/dashboard/subscriptions/${providerId}/letters/${letter.letterId}`}
               key={letter.letterId}
+              onClick={() => handleViewArchivedLetterClick(letter.letterId, letter.title)}
             >
               <Card className="h-full cursor-pointer hover:bg-muted/50 transition-colors">
                 <CardHeader className="pb-2">

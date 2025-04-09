@@ -8,6 +8,7 @@ import { Brain, EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { sendGAEvent } from "@/lib/analytics";
 
 export default function Login() {
   const router = useRouter();
@@ -46,6 +47,9 @@ export default function Login() {
         pwd: values.password as string,
         isSessionOnly: values.remember ? false : true,
       });
+
+      // Send the login event to Google Analytics
+      sendGAEvent('login', { method: 'email' });
 
       router.push("/dashboard");
     } catch (err: any) {

@@ -8,6 +8,7 @@ import { resetPassword } from "@/lib/api/requests/auth.requests";
 import { Brain, Loader2, EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { usePasswordStrength } from "@/hooks/use-password-strength";
+import { sendGAEvent } from "@/lib/analytics";
 
 export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
@@ -92,6 +93,10 @@ export default function ResetPassword() {
         token,
         newPassword: password,
       });
+
+      // Send reset_password event
+      sendGAEvent('reset_password');
+
       setSuccess(true);
 
       // Redirect to login after successful password reset with a delay

@@ -30,6 +30,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { GetUserResponse, UpdateUserRequest } from "@api/types/auth.types";
+import { sendGAEvent } from "@/lib/analytics";
 
 function SettingsSkeleton() {
   return (
@@ -130,6 +131,9 @@ export default function SettingsPage() {
 
       await updateAccount(updateData);
 
+      // Send profile_update event
+      sendGAEvent('profile_update');
+
       toast({
         title: "Profile updated",
         description: "Your profile information has been saved successfully.",
@@ -151,6 +155,10 @@ export default function SettingsPage() {
     setIsLoading(true);
     try {
       await deleteAccount();
+
+      // Send account_delete event
+      sendGAEvent('account_delete');
+
       toast({
         title: "Account deleted",
         description: "Your account has been permanently deleted.",
@@ -165,6 +173,11 @@ export default function SettingsPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleChangePlanClick = () => {
+    sendGAEvent('change_plan_click', { source: 'settings_page' });
+    // Navigation happens via Link
   };
 
   if (isDataLoading) {
@@ -250,31 +263,26 @@ export default function SettingsPage() {
               You are currently on the {profileData.plan || "Free"} plan.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="font-medium">{profileData.plan || "Free"} Plan</p>
-                <p className="text-sm text-muted-foreground">
-                  {profileData.plan === "Premium" 
-                    ? "Unlimited providers and features" 
-                    : "Limited to 1 provider"}
-                </p>
-              </div>
-              <Link href="/pricing-plans">
-                <Button>Upgrade Your Plan</Button>
-              </Link>
-            </div>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Manage your subscription and billing details.
+            </p>
           </CardContent>
+          <CardFooter>
+            <Link href="/pricing-plans" onClick={handleChangePlanClick}>
+              <Button variant="outline">Change Plan</Button>
+            </Link>
+          </CardFooter>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Delete Account</CardTitle>
+            <CardTitle>Danger Zone</CardTitle>
             <CardDescription>
               Permanently delete your account and all associated data.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardFooter>
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" disabled={isLoading}>
@@ -283,24 +291,26 @@ export default function SettingsPage() {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    Are you absolutely sure?
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete your account? This action
-                    cannot be undone.
+                    This action cannot be undone. This will permanently delete your
+                    account and remove your data from our servers.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteAccount}
-                    disabled={isLoading}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Confirm
+                    Delete Account
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          </CardContent>
+          </CardFooter>
         </Card>
       </div>
     </div>

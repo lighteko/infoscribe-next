@@ -15,9 +15,21 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import { sendGAEvent } from "@/lib/analytics";
 
 export default function Home() {
   const { isAuthenticated } = useAuthStore();
+
+  const handleHeroCTAClick = () => {
+    const eventName = isAuthenticated ? 'go_to_dashboard_click' : 'get_started_click';
+    sendGAEvent(eventName, { source: 'hero_section' });
+    // Navigation happens via Link
+  };
+
+  const handleViewPricingClick = () => {
+    sendGAEvent('view_pricing_click', { source: 'hero_section' });
+    // Navigation happens via Link
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary">
@@ -32,7 +44,10 @@ export default function Home() {
           categories and delivers a curated newsletter to your inbox.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 mt-4 md:mt-8">
-          <Link href={isAuthenticated ? "/dashboard" : "/auth/signup"}>
+          <Link 
+            href={isAuthenticated ? "/dashboard" : "/auth/signup"}
+            onClick={handleHeroCTAClick}
+          >
             <Button
               size="lg"
               className="bg-[#F2F3D9] text-[#030027] hover:bg-[#F2F3D9]/90 w-full sm:w-auto"
@@ -40,7 +55,7 @@ export default function Home() {
               {isAuthenticated ? "Go to Dashboard" : "Get Started for Free"}
             </Button>
           </Link>
-          <Link href="/pricing-plans">
+          <Link href="/pricing-plans" onClick={handleViewPricingClick}>
             <Button
               variant="outline"
               size="lg"
@@ -264,7 +279,10 @@ export default function Home() {
             informed with Infoscribe.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href={isAuthenticated ? "/dashboard" : "/auth/signup"}>
+            <Link 
+              href={isAuthenticated ? "/dashboard" : "/auth/signup"}
+              onClick={handleHeroCTAClick}
+            >
               <Button
                 size="lg"
                 className="bg-[#030027] text-[#F2F3D9] hover:bg-[#030027]/90 w-full sm:w-auto"
@@ -272,7 +290,7 @@ export default function Home() {
                 {isAuthenticated ? "Go to Dashboard" : "Get Started for Free"}
               </Button>
             </Link>
-            <Link href="/pricing-plans">
+            <Link href="/pricing-plans" onClick={handleViewPricingClick}>
               <Button
                 variant="outline"
                 size="lg"

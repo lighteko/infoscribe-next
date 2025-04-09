@@ -10,6 +10,7 @@ import { getAllMyProviders } from "@/lib/api/requests/provider.requests";
 import { cron2Weekday } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { sendGAEvent } from "@/lib/analytics";
 
 function ProvidersSkeleton() {
   return (
@@ -73,8 +74,19 @@ export default function MyProvidersPage() {
     fetchProviders();
   }, []);
 
-  const handleProviderClick = (providerId: string) => {
+  const handleProviderClick = (providerId: string, providerTitle: string) => {
+    sendGAEvent('view_provider_details_click', { provider_id: providerId, provider_title: providerTitle });
     router.push(`/dashboard/my-providers/${providerId}`);
+  };
+
+  const handleCreateProviderClick = () => {
+    sendGAEvent('create_provider_page_view');
+    // Navigation happens via Link
+  };
+
+  const handleUpgradePlanClick = () => {
+    sendGAEvent('upgrade_plan_click', { source: 'my_providers_limit' });
+    // Navigation happens via Link
   };
 
   if (isLoading) {
@@ -90,7 +102,7 @@ export default function MyProvidersPage() {
             Manage your newsletter providers here.
           </p>
         </div>
-        <Link href="/dashboard/my-providers/create">
+        <Link href="/dashboard/my-providers/create" onClick={handleCreateProviderClick}>
           <Button className="self-start sm:self-auto">Create Provider</Button>
         </Link>
       </div>
@@ -101,7 +113,7 @@ export default function MyProvidersPage() {
             <p className="text-muted-foreground text-center">
               You haven't created any providers yet.
             </p>
-            <Link href="/dashboard/my-providers/create">
+            <Link href="/dashboard/my-providers/create" onClick={handleCreateProviderClick}>
               <Button className="self-start sm:self-auto">
                 Create your first provider
               </Button>
@@ -114,7 +126,7 @@ export default function MyProvidersPage() {
             <Card
               key={provider.providerId}
               className="p-4 sm:p-6 hover:shadow-md transition-all cursor-pointer"
-              onClick={() => handleProviderClick(provider.providerId)}
+              onClick={() => handleProviderClick(provider.providerId, provider.title)}
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="space-y-3">
@@ -156,9 +168,7 @@ export default function MyProvidersPage() {
                     className="justify-center"
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push(
-                        `/dashboard/my-providers/${provider.providerId}`
-                      );
+                      handleProviderClick(provider.providerId, provider.title);
                     }}
                   >
                     View Details
@@ -198,7 +208,7 @@ export default function MyProvidersPage() {
               You've reached the limit of 1 provider on the free plan. Upgrade
               to Pro to create unlimited providers.
             </p>
-            <Link href="/pricing-plans">
+            <Link href="/pricing-plans" onClick={handleUpgradePlanClick}>
               <Button variant="default">Upgrade Your Plan</Button>
             </Link>
           </div>

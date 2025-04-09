@@ -7,6 +7,9 @@ import { signUp } from "@/lib/api/requests/auth.requests";
 import { Brain, EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { usePasswordStrength } from "@/hooks/use-password-strength";
+import { sendGAEvent } from "@/lib/analytics";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,8 +18,9 @@ export default function SignUp() {
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreedToPolicy, setAgreedToPolicy] = useState(false);
 
-  // Use our custom hook for password strength
+  // Use our custom hook for password
   const { passwordStrength, validatePasswordStrength, checkPasswordStrength } =
     usePasswordStrength();
 
@@ -47,6 +51,13 @@ export default function SignUp() {
     setFieldErrors({});
     setSuccess(false);
 
+    // Check if policy agreed
+    if (!agreedToPolicy) {
+      setFieldErrors({ policy: "You must agree to the Privacy Policy to sign up." });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const formData = new FormData(e.target as HTMLFormElement);
       const values = Object.fromEntries(formData.entries());
@@ -73,8 +84,12 @@ export default function SignUp() {
         pwd: values.password as string,
       });
 
+      // Send the sign_up event to Google Analytics
+      sendGAEvent('sign_up', { method: 'email' });
+
       setSuccess(true);
       (e.target as HTMLFormElement).reset();
+      setAgreedToPolicy(false);
     } catch (err) {
       console.error("Signup error:", err);
 
@@ -313,6 +328,35 @@ export default function SignUp() {
                   {fieldErrors.confirmPassword}
                 </p>
               )}
+            </div>
+
+            {/* Privacy Policy Checkbox */}
+            <div className="items-top flex space-x-2">
+              <Checkbox 
+                id="policy" 
+                name="policy"
+                checked={agreedToPolicy}
+                onCheckedChange={(checked) => setAgreedToPolicy(checked as boolean)}
+                aria-labelledby="policy-label"
+              />
+              <div className="grid gap-1.5 leading-none">
+                <Label
+                  htmlFor="policy"
+                  id="policy-label"
+                  className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
+                    fieldErrors.policy ? "text-destructive" : ""
+                  }`}
+                >
+                  I agree to the Infoscribe{" "}
+                  <Link href="/privacy-policy" target="_blank" className="underline text-primary hover:text-primary/80">
+                    Privacy Policy
+                  </Link>
+                  .
+                </Label>
+                {fieldErrors.policy && (
+                  <p className="text-xs text-destructive">{fieldErrors.policy}</p>
+                )}
+              </div>
             </div>
 
             <Button

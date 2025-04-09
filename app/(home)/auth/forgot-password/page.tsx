@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { forgotPassword } from "@/lib/api/requests/auth.requests";
 import { Brain, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { sendGAEvent } from "@/lib/analytics";
 
 export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +33,9 @@ export default function ForgotPassword() {
         email: values.email as string,
         username: values.username as string,
       });
+
+      sendGAEvent('forgot_password_request');
+
       setSuccess(true);
       (e.target as HTMLFormElement).reset();
     } catch (error) {

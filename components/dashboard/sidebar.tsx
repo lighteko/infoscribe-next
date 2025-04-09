@@ -10,6 +10,7 @@ import {
   Cog6ToothIcon,
   ArrowRightStartOnRectangleIcon,
   XMarkIcon,
+  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { logOut } from "@/lib/api/requests/auth.requests";
 
@@ -24,6 +25,11 @@ const navigation = [
     name: "Subscriptions",
     href: "/dashboard/subscriptions",
     icon: EnvelopeIcon,
+  },
+  {
+    name: "Discover",
+    href: "/dashboard/subscriptions/discover",
+    icon: MagnifyingGlassIcon,
   },
   { name: "Settings", href: "/dashboard/settings", icon: Cog6ToothIcon },
 ];

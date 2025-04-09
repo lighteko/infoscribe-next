@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { AuthProvider } from "@/lib/providers/auth-provider";
+import Analytics from "@/components/GoogleAnalytics";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ export default function RootLayout({
             {children}
           </div>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );

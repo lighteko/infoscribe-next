@@ -17,9 +17,9 @@ export async function getLetter(letterId: string) {
   );
 }
 
-export async function getUserInbox(userId: string) {
+export async function getUserInbox() {
   return executeWithTokenRefresh(() =>
-    apiClient(`/letter/inbox?userId=${userId}`, {
+    apiClient(`/letter/inbox`, {
       method: "GET",
     })
   );

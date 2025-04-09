@@ -38,6 +38,8 @@ export default function CreateProviderPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>("");
   const [selectedDay, setSelectedDay] = useState<string>("");
+  const [selectedHour, setSelectedHour] = useState<number>(8);
+  const [selectedPeriod, setSelectedPeriod] = useState<"AM" | "PM">("AM");
 
   const handleAddTag = () => {
     const trimmedTag = tagInput.trim();
@@ -129,13 +131,18 @@ export default function CreateProviderPage() {
     try {
       setIsSubmitting(true);
 
+      // Convert 12-hour format to 24-hour format
+      const hour24 = selectedPeriod === "PM" 
+        ? (selectedHour === 12 ? 12 : selectedHour + 12)
+        : (selectedHour === 12 ? 0 : selectedHour);
+
       // Prepare data for submission
       const providerData = {
         title: formData.name,
         summary: formData.description,
         tags,
         locale: "En-US",
-        schedule: weekday2Cron(selectedDay),
+        schedule: weekday2Cron(selectedDay, hour24),
       };
 
       await createProvider(providerData);
@@ -303,46 +310,129 @@ export default function CreateProviderPage() {
 
                 <div className="space-y-2">
                   <Label className={errors.day ? "text-destructive" : ""}>
-                    Sending Day (Weekly)
+                    Sending Schedule (Weekly)
                   </Label>
-                  <div className="flex flex-wrap gap-2 mt-1.5">
-                    {weekdays.map((day) => (
-                      <Button
-                        key={day.value}
-                        type="button"
-                        size="sm"
-                        variant={
-                          selectedDay === day.value ? "default" : "outline"
-                        }
-                        className={`px-3 py-1 h-8 transition-all ${
-                          selectedDay === day.value
-                            ? "bg-primary text-primary-foreground"
-                            : errors.day
-                            ? "border-destructive text-destructive hover:bg-destructive/10"
-                            : "hover:bg-slate-100"
-                        }`}
-                        onClick={() => {
-                          setSelectedDay(day.value);
-                          if (errors.day) {
-                            setErrors((prev) => {
-                              const newErrors = { ...prev };
-                              delete newErrors.day;
-                              return newErrors;
-                            });
-                          }
-                        }}
-                      >
-                        {day.value}
-                      </Button>
-                    ))}
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Select Day</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-wrap gap-2">
+                        {weekdays.map((day) => (
+                          <Button
+                            key={day.value}
+                            type="button"
+                            size="sm"
+                            variant={
+                              selectedDay === day.value ? "default" : "outline"
+                            }
+                            className={`w-full md:w-auto px-3 py-1 h-8 transition-all ${
+                              selectedDay === day.value
+                                ? "bg-primary text-primary-foreground"
+                                : errors.day
+                                ? "border-destructive text-destructive hover:bg-destructive/10"
+                                : "hover:bg-slate-100"
+                            }`}
+                            onClick={() => {
+                              setSelectedDay(day.value);
+                              if (errors.day) {
+                                setErrors((prev) => {
+                                  const newErrors = { ...prev };
+                                  delete newErrors.day;
+                                  return newErrors;
+                                });
+                              }
+                            }}
+                          >
+                            <span className="text-xs sm:text-sm">{day.label}</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Select Time</p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-md w-full sm:w-auto">
+                          <div className="flex-1 sm:flex-none min-w-[80px]">
+                            <label htmlFor="hour-select" className="text-xs text-muted-foreground mb-1">Hour</label>
+                            <select
+                              id="hour-select"
+                              value={selectedHour}
+                              onChange={(e) => setSelectedHour(Number(e.target.value))}
+                              className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
+                              aria-label="Select hour"
+                            >
+                              {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                                <option key={hour} value={hour}>
+                                  {hour}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="flex-1 sm:flex-none min-w-[80px]">
+                            <label htmlFor="period-select" className="text-xs text-muted-foreground mb-1">AM/PM</label>
+                            <select
+                              id="period-select"
+                              value={selectedPeriod}
+                              onChange={(e) => setSelectedPeriod(e.target.value as "AM" | "PM")}
+                              className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
+                              aria-label="Select AM or PM"
+                            >
+                              <option value="AM">AM</option>
+                              <option value="PM">PM</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {selectedDay && (
+                      <div className="mt-4 p-3 bg-slate-50 rounded-md space-y-2">
+                        <p className="text-sm text-muted-foreground">
+                          Your newsletter will be sent every{" "}
+                          <span className="font-medium text-foreground">
+                            {weekdays.find(day => day.value === selectedDay)?.label}
+                          </span>{" "}
+                          at{" "}
+                          <span className="font-medium text-foreground">
+                            {selectedHour}:00 {selectedPeriod}
+                          </span>
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          First newsletter will be sent on{" "}
+                          <span className="font-medium text-foreground">
+                            {(() => {
+                              const now = new Date();
+                              const currentDay = now.getDay();
+                              const targetDay = weekdays.findIndex(day => day.value === selectedDay);
+                              const daysUntilTarget = (targetDay - currentDay + 7) % 7;
+                              const firstDate = new Date(now);
+                              firstDate.setDate(now.getDate() + daysUntilTarget + 7); // Add 7 days for next week
+                              firstDate.setHours(selectedPeriod === "PM" 
+                                ? (selectedHour === 12 ? 12 : selectedHour + 12)
+                                : (selectedHour === 12 ? 0 : selectedHour), 0, 0, 0);
+                              return firstDate.toLocaleDateString('en-US', { 
+                                weekday: 'long',
+                                month: 'long',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                              });
+                            })()}
+                          </span>
+                        </p>
+                      </div>
+                    )}
                   </div>
+
                   {errors.day && (
                     <p className="text-xs text-destructive mt-1">
                       {errors.day}
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground mt-1">
-                    Newsletters are dispatched weekly on your selected day.
+                    Newsletters are dispatched weekly on your selected day at the specified time.
                   </p>
                 </div>
               </div>

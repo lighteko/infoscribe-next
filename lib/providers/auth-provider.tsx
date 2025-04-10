@@ -3,15 +3,18 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { logOut, refreshToken } from "@/lib/api/requests/auth.requests";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { accessToken } = useAuthStore();
   const [authChecked, setAuthChecked] = useState(false);
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
+
   // Check if we need to refresh the token
   useEffect(() => {
+    if (pathname.includes("auth")) return;
     const checkAndRefreshToken = async () => {
       try {
         if (!accessToken) {

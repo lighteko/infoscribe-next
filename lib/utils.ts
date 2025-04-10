@@ -31,7 +31,8 @@ export function weekday2Cron(weekday: string, hour: number = 8) {
   const utcHour = utcDate.getUTCHours();
   const utcDayOfWeek = utcDate.getUTCDay();
 
-  return `cron(0 ${utcHour} ? * ${utcDayOfWeek} *)`;
+  // Convert 0-based JS day to 1-based cron day
+  return `cron(0 ${utcHour} ? * ${utcDayOfWeek + 1} *)`;
 }
 
 export function cron2Weekday(cron: string) {
@@ -44,8 +45,10 @@ export function cron2Weekday(cron: string) {
   // Create a date object in UTC
   const utcDate = new Date();
   utcDate.setUTCHours(parseInt(hour), parseInt(minute), 0, 0);
+  // Adjust calculation: convert 1-based cron dayOfWeek to 0-based for JS calculation
   utcDate.setUTCDate(
-    utcDate.getUTCDate() + ((parseInt(dayOfWeek) - utcDate.getUTCDay() + 7) % 7)
+    utcDate.getUTCDate() +
+      ((parseInt(dayOfWeek) - 1 - utcDate.getUTCDay() + 7) % 7)
   );
 
   // Convert to local time in the browser's timezone
@@ -56,7 +59,7 @@ export function cron2Weekday(cron: string) {
   const localDayOfWeek = localDate.getDay();
 
   // Convert to 12-hour format with AM/PM
-  const period = localHour >= 12 ? "P.M." : "A.M.";
+  const period = localHour >= 12 ? "PM" : "AM";
   const displayHour = localHour % 12 || 12; // Convert 0 to 12 for 12 AM
 
   const weekdays = [
@@ -85,8 +88,10 @@ export function cron2LocalTimeFormat(cron: string): {
   const targetTimezone = getBrowserTimezone();
   const utcDate = new Date();
   utcDate.setUTCHours(parseInt(hour), parseInt(minute), 0, 0);
+  // Adjust calculation: convert 1-based cron dayOfWeek to 0-based for JS calculation
   utcDate.setUTCDate(
-    utcDate.getUTCDate() + ((parseInt(dayOfWeek) - utcDate.getUTCDay() + 7) % 7)
+    utcDate.getUTCDate() +
+      ((parseInt(dayOfWeek) - 1 - utcDate.getUTCDay() + 7) % 7)
   );
 
   const localDate = new Date(
@@ -95,7 +100,7 @@ export function cron2LocalTimeFormat(cron: string): {
   const localHour = localDate.getHours();
   const localDayOfWeek = localDate.getDay();
 
-  const period = localHour >= 12 ? "P.M." : "A.M.";
+  const period = localHour >= 12 ? "PM" : "AM";
   const displayHour = localHour % 12 || 12;
 
   return {
@@ -103,4 +108,39 @@ export function cron2LocalTimeFormat(cron: string): {
     hour: displayHour,
     period: period,
   };
+}
+
+export function calculateFirstDispatchDate(
+  weekdays: { value: string; label: string }[],
+  selectedDay: string,
+  selectedHour: number,
+  selectedPeriod: string
+) {
+  const now = new Date();
+  const currentDay = now.getDay();
+  const targetDay = weekdays.findIndex((day) => day.value === selectedDay);
+  const daysUntilTarget = (targetDay - currentDay + 7) % 7;
+  const firstDate = new Date(now);
+  firstDate.setDate(now.getDate() + daysUntilTarget + 7); // Add 7 days for next week
+  firstDate.setHours(
+    selectedPeriod === "PM"
+      ? selectedHour === 12
+        ? 12
+        : selectedHour + 12
+      : selectedHour === 12
+      ? 0
+      : selectedHour,
+    0,
+    0,
+    0
+  );
+  return firstDate.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 }

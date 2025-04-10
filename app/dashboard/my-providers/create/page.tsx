@@ -15,7 +15,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { createProvider } from "@/lib/api/requests/provider.requests";
-import { weekday2Cron } from "@/lib/utils";
+import { calculateFirstDispatchDate, weekday2Cron } from "@/lib/utils";
 import { sendGAEvent } from "@/lib/analytics";
 
 const weekdays = [
@@ -133,9 +133,14 @@ export default function CreateProviderPage() {
       setIsSubmitting(true);
 
       // Convert 12-hour format to 24-hour format
-      const hour24 = selectedPeriod === "PM" 
-        ? (selectedHour === 12 ? 12 : selectedHour + 12)
-        : (selectedHour === 12 ? 0 : selectedHour);
+      const hour24 =
+        selectedPeriod === "PM"
+          ? selectedHour === 12
+            ? 12
+            : selectedHour + 12
+          : selectedHour === 12
+          ? 0
+          : selectedHour;
 
       // Prepare data for submission
       const providerData = {
@@ -149,10 +154,10 @@ export default function CreateProviderPage() {
       await createProvider(providerData);
 
       // Send create_provider event
-      sendGAEvent('create_provider', { 
+      sendGAEvent("create_provider", {
         provider_title: providerData.title,
-        tags: providerData.tags.join(','), // Send tags as comma-separated string
-        schedule: providerData.schedule
+        tags: providerData.tags.join(","), // Send tags as comma-separated string
+        schedule: providerData.schedule,
       });
 
       toast({
@@ -350,7 +355,9 @@ export default function CreateProviderPage() {
                               }
                             }}
                           >
-                            <span className="text-xs sm:text-sm">{day.label}</span>
+                            <span className="text-xs sm:text-sm">
+                              {day.label}
+                            </span>
                           </Button>
                         ))}
                       </div>
@@ -361,27 +368,43 @@ export default function CreateProviderPage() {
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-md w-full sm:w-auto">
                           <div className="flex-1 sm:flex-none min-w-[80px]">
-                            <label htmlFor="hour-select" className="text-xs text-muted-foreground mb-1">Hour</label>
+                            <label
+                              htmlFor="hour-select"
+                              className="text-xs text-muted-foreground mb-1"
+                            >
+                              Hour
+                            </label>
                             <select
                               id="hour-select"
                               value={selectedHour}
-                              onChange={(e) => setSelectedHour(Number(e.target.value))}
+                              onChange={(e) =>
+                                setSelectedHour(Number(e.target.value))
+                              }
                               className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
                               aria-label="Select hour"
                             >
-                              {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
-                                <option key={hour} value={hour}>
-                                  {hour}
-                                </option>
-                              ))}
+                              {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                                (hour) => (
+                                  <option key={hour} value={hour}>
+                                    {hour}
+                                  </option>
+                                )
+                              )}
                             </select>
                           </div>
                           <div className="flex-1 sm:flex-none min-w-[80px]">
-                            <label htmlFor="period-select" className="text-xs text-muted-foreground mb-1">AM/PM</label>
+                            <label
+                              htmlFor="period-select"
+                              className="text-xs text-muted-foreground mb-1"
+                            >
+                              AM/PM
+                            </label>
                             <select
                               id="period-select"
                               value={selectedPeriod}
-                              onChange={(e) => setSelectedPeriod(e.target.value as "AM" | "PM")}
+                              onChange={(e) =>
+                                setSelectedPeriod(e.target.value as "AM" | "PM")
+                              }
                               className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
                               aria-label="Select AM or PM"
                             >
@@ -398,7 +421,10 @@ export default function CreateProviderPage() {
                         <p className="text-sm text-muted-foreground">
                           Your newsletter will be sent every{" "}
                           <span className="font-medium text-foreground">
-                            {weekdays.find(day => day.value === selectedDay)?.label}
+                            {
+                              weekdays.find((day) => day.value === selectedDay)
+                                ?.label
+                            }
                           </span>{" "}
                           at{" "}
                           <span className="font-medium text-foreground">
@@ -408,26 +434,12 @@ export default function CreateProviderPage() {
                         <p className="text-sm text-muted-foreground">
                           First newsletter will be sent on{" "}
                           <span className="font-medium text-foreground">
-                            {(() => {
-                              const now = new Date();
-                              const currentDay = now.getDay();
-                              const targetDay = weekdays.findIndex(day => day.value === selectedDay);
-                              const daysUntilTarget = (targetDay - currentDay + 7) % 7;
-                              const firstDate = new Date(now);
-                              firstDate.setDate(now.getDate() + daysUntilTarget + 7); // Add 7 days for next week
-                              firstDate.setHours(selectedPeriod === "PM" 
-                                ? (selectedHour === 12 ? 12 : selectedHour + 12)
-                                : (selectedHour === 12 ? 0 : selectedHour), 0, 0, 0);
-                              return firstDate.toLocaleDateString('en-US', { 
-                                weekday: 'long',
-                                month: 'long',
-                                day: 'numeric',
-                                year: 'numeric',
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true
-                              });
-                            })()}
+                            {calculateFirstDispatchDate(
+                              weekdays,
+                              selectedDay,
+                              selectedHour,
+                              selectedPeriod
+                            )}
                           </span>
                         </p>
                       </div>
@@ -440,7 +452,8 @@ export default function CreateProviderPage() {
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground mt-1">
-                    Newsletters are dispatched weekly on your selected day at the specified time.
+                    Newsletters are dispatched weekly on your selected day at
+                    the specified time.
                   </p>
                 </div>
               </div>

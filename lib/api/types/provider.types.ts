@@ -44,6 +44,4 @@ export interface UpdateProviderRequest {
   providerId: string;
   title: string;
   summary: string;
-  schedule: string;
-  locale: string;
 }
